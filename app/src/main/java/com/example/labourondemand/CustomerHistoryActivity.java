@@ -46,7 +46,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
     protected Toolbar toolbar;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private String tag = LabourerMainActivity.class.getName();
+    private String tag = CustomerMainActivity.class.getName();
     private BottomNavigationView navigation;
     private CustomerFinal customer;
     private RecyclerView recyclerView;
@@ -86,7 +86,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         customerHistoryAdapter = new CustomerHistoryAdapter(context, new ArrayList<ServicesFinal>());
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         if(customer != null && customer.getHistoryServices() != null){
-            recyclerView.setAdapter(new LabourerHistoryRVAdapter(context,customer.getHistoryServices()));
+            recyclerView.setAdapter(new CustomerHistoryAdapter(context,customer.getHistoryServices()));
         }
         else {
             recyclerView.setAdapter(customerHistoryAdapter);

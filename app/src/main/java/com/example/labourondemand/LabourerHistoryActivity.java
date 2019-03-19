@@ -19,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,6 +29,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +42,13 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
     protected Toolbar toolbar;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private String tag = LabourerHomeActivity.class.getName();
+    private String tag = LabourerMainActivity.class.getName();
     private BottomNavigationView navigation;
+    private LabourerFinal labourer;
     private RecyclerView recyclerView;
     private Context context;
+    private static final String TAG = "LabourerHistoryActivity";
+    private LabourerHistoryAdapter labourerHistoryAdapter;
 
 
     @SuppressLint("ResourceType")
@@ -49,21 +56,47 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_labourer_history);
-        context = this;
-        toolbar = findViewById(R.id.labourer_history_tb);
-        drawerLayout = findViewById(R.id.labourer_history_dl);
-        navigationView = findViewById(R.id.labourer_history_nv);
-        navigation = findViewById(R.id.bottom_nav_view);
 
+        labourer = (LabourerFinal) getIntent().getExtras().getSerializable("labourer");
+
+        toolbar = findViewById(R.id.customer_history_tb);
+        drawerLayout = findViewById(R.id.customer_history_dl);
+        navigationView = findViewById(R.id.customer_history_nv);
+        navigation = findViewById(R.id.bottom_nav_view);
+        recyclerView = findViewById(R.id.customer_history_rv);
+        context = this;
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.setCheckedItem(1);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(0).setChecked(true);
+
+        labourerHistoryAdapter = new LabourerHistoryAdapter(context, new ArrayList<ServicesFinal>());
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        if(labourer != null && labourer.getHistoryServices() != null){
+            recyclerView.setAdapter(new CustomerHistoryAdapter(context, labourer.getHistoryServices()));
+        }
+        else {
+            recyclerView.setAdapter(labourerHistoryAdapter);
+//            for(String s : customer.getServices())
+            firebaseFirestore.collection("services").whereEqualTo("status","incoming").get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                    ServicesFinal service = documentSnapshot.toObject(ServicesFinal.class);
+                                    labourerHistoryAdapter.added(service);
+                                }
+                            }
+                        }
+                    });
+        }
 
 
 //        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
