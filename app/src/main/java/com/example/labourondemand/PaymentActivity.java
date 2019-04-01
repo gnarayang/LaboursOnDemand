@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -126,7 +127,7 @@ public class PaymentActivity extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-
+                                                Log.d("payment 2",e.toString());
                                             }
                                         });
                             }
@@ -136,7 +137,7 @@ public class PaymentActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-
+                            Log.d("payment 1",e.toString());
                         }
                     });
         } else {
@@ -178,15 +179,13 @@ public class PaymentActivity extends AppCompatActivity {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                Log.d("error at payment",e.toString());
 
                             }
                         });
             }
 
-        }/* else {
-            labourerAdapter = new LabourerAdapter(this, servicesFinal);
-            recyclerView.setAdapter(labourerAdapter);
-        }*/
+        }
 
 
         pay = findViewById(R.id.payment_pay_btn);
@@ -195,7 +194,14 @@ public class PaymentActivity extends AppCompatActivity {
         pay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                check(v);
+                if(customerFinal.getWallet() >= (servicesFinal.getNumOfLabourers() * servicesFinal.getCustomerAmount()))
+                {
+                    check(v);
+                }else
+                {
+                    Toast.makeText(context,"LOW BALANCE ",Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 
@@ -216,7 +222,9 @@ public class PaymentActivity extends AppCompatActivity {
         builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                EditText password = dialogView.findViewById(R.id.wallet_et_password);
+                TextInputEditText password = dialogView.findViewById(R.id.wallet_tiet_password);
+                TextInputEditText amount = dialogView.findViewById(R.id.wallet_tiet_add_money);
+                amount.setVisibility(View.GONE);
 
                 if (password.getText().toString().equals(customerFinal.getPassword())) {
                     // do payent
@@ -225,7 +233,6 @@ public class PaymentActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
 
                 }
-
 
             }
 
@@ -288,6 +295,7 @@ public class PaymentActivity extends AppCompatActivity {
                                                     .addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
+                                                            Log.d("error at payment 3",e.toString());
 
                                                         }
                                                     });
@@ -307,7 +315,7 @@ public class PaymentActivity extends AppCompatActivity {
                                     .addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-
+                                            Log.d("error at payment 4",e.toString());
                                         }
                                     });
 
