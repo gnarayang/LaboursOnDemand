@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -57,6 +59,35 @@ public class LabourerHistoryAdapter extends RecyclerView.Adapter<LabourerHistory
 
         viewHolder.jobcost.setText(String.valueOf(service.getCustomerAmount()));
         viewHolder.date.setText(service.getEndTime());
+        viewHolder.jobTitle.setText(service.getTitle());
+        Glide.with(context).load(service.getImages().get(0)).into(viewHolder.labourerImage);
+
+        if(service.getSkill().equals("Carpenter"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_carpenter_tools_colour));
+        }else if(service.getSkill().equals("Plumber"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_plumber_tools));
+
+        }else if(service.getSkill().equals("Electrician"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_electric_colour));
+
+        }else if(service.getSkill().equals("Painter"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_paint_roller));
+
+        }else if(service.getSkill().equals("Constructor"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_construction_colour));
+
+        }else if(service.getSkill().equals("Chef"))
+        {
+            viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_cooking_colour));
+
+        }
+
+        viewHolder.time.setText(service.getStartTime());
 
     }
 

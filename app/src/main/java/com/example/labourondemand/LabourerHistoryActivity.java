@@ -59,11 +59,12 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
 
         labourer = (LabourerFinal) getIntent().getExtras().getSerializable("labourer");
 
-        toolbar = findViewById(R.id.customer_history_tb);
-        drawerLayout = findViewById(R.id.customer_history_dl);
-        navigationView = findViewById(R.id.customer_history_nv);
+        toolbar = findViewById(R.id.labourer_history_tb);
+        drawerLayout = findViewById(R.id.labourer_history_dl);
+        navigationView = findViewById(R.id.labourer_history_nv);
         navigation = findViewById(R.id.bottom_nav_view);
-        recyclerView = findViewById(R.id.customer_history_rv);
+        recyclerView = findViewById(R.id.labourer_history_rv);
+        drawerLayout = findViewById(R.id.labourer_history_dl);
         context = this;
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -84,7 +85,7 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         else {
             recyclerView.setAdapter(labourerHistoryAdapter);
 //            for(String s : customer.getServices())
-            firebaseFirestore.collection("services").whereEqualTo("status","incoming").get()
+            firebaseFirestore.collection("services").whereEqualTo("status","history").get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {

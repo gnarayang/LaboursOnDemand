@@ -91,7 +91,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         else {
             recyclerView.setAdapter(customerHistoryAdapter);
 //            for(String s : customer.getServices())
-            firebaseFirestore.collection("services").whereEqualTo("status","incoming").get()
+            firebaseFirestore.collection("services").whereEqualTo("status","history").get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {

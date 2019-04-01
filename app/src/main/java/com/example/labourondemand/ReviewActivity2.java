@@ -1,6 +1,7 @@
 package com.example.labourondemand;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -19,14 +20,25 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.labourondemand.notifications.Api;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.okhttp.ResponseBody;
 
+import java.io.IOException;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ReviewActivity2 extends AppCompatActivity {
 
@@ -43,6 +55,7 @@ public class ReviewActivity2 extends AppCompatActivity {
     private TextInputLayout feedback;
     private ProgressBar progressBar;
     private CustomerFinal customerFinal;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +114,47 @@ public class ReviewActivity2 extends AppCompatActivity {
                         submitButton.setVisibility(View.GONE);
                         progressBar.setVisibility(View.VISIBLE);
                         submitReview();
+                        for(String s : servicesFinal.getSelectedLabourerUID()){
+                            firebaseFirestore.collection("labourer").document(s)
+                                    .get()
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                        @Override
+                                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                            String token = documentSnapshot.getString("token");
+                                            Retrofit retrofit = new Retrofit.Builder()
+                                                    .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                    .addConverterFactory(GsonConverterFactory.create())
+                                                    .build();
+
+                                            Api api = retrofit.create(Api.class);
+                                            String title = "Your work has been reviewed by Customer";
+                                            String body = "Rating: " + servicesFinal.getRating().toString();
+                                            Call<ResponseBody> call = api.sendNotification(token,title,body);
+
+                                            call.enqueue(new Callback<ResponseBody>() {
+                                                @Override
+                                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                    try {
+                                                        Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                }
+                                            });
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                        }
                     }
                 }
             }

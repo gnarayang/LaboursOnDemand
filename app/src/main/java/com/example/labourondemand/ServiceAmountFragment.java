@@ -16,15 +16,25 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.labourondemand.notifications.Api;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.squareup.okhttp.ResponseBody;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -45,6 +55,7 @@ public class ServiceAmountFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private FirebaseFirestore firebaseFirestore;
     private OnFragmentInteractionListener mListener;
 
     public ServiceAmountFragment() {
@@ -84,8 +95,8 @@ public class ServiceAmountFragment extends Fragment {
     private TextView customerAmount;
     private TextInputEditText labourerAmount;
     private Button submit;
-    private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
+    private Context context;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,6 +109,7 @@ public class ServiceAmountFragment extends Fragment {
         submit = view.findViewById(R.id.service_amount_btn_submit);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
+        context = view.getContext();
 
 //        customerAmount.setText(String.valueOf(services.getCustomerAmount()));
 
@@ -150,6 +162,47 @@ public class ServiceAmountFragment extends Fragment {
                                                     Log.d("tag",e.toString());
                                                 }
                                             });*/
+                                    firebaseFirestore.collection("customer").document(services.getCustomerUID())
+                                            .get()
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    String token = documentSnapshot.getString("token");
+                                                    Retrofit retrofit = new Retrofit.Builder()
+                                                            .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                            .addConverterFactory(GsonConverterFactory.create())
+                                                            .build();
+
+                                                    Api api = retrofit.create(Api.class);
+                                                    String title = services.getTitle();
+                                                    String body = "A labourer applied for your job";
+                                                    Call<ResponseBody> call = api.sendNotification(token,title,body);
+
+                                                    call.enqueue(new Callback<ResponseBody>() {
+                                                        @Override
+                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                            try {
+                                                                Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                        }
+                                                    });
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                }
+                                            });
+
+
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                         @Override
