@@ -85,7 +85,7 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         else {
             recyclerView.setAdapter(labourerHistoryAdapter);
 //            for(String s : customer.getServices())
-            firebaseFirestore.collection("services").whereEqualTo("status","history").get()
+            firebaseFirestore.collection("services").whereEqualTo("status","history").whereArrayContains("selectedLabourerUID",labourer.getId()).get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {

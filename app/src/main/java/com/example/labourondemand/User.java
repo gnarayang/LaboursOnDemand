@@ -8,7 +8,7 @@ import com.google.firebase.firestore.GeoPoint;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User implements Serializable/*implements Parcelable*/{
+public class    User implements Serializable/*implements Parcelable*/{
 
     private String name, image, dob, city, state, addressLine1, addressLine2, addressLine3, id, password, email;
     private GeoPoint currentLocation;
