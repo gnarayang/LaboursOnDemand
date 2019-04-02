@@ -12,6 +12,7 @@ public class NotificationService extends FirebaseMessagingService {
             String Title = remoteMessage.getNotification().getTitle();
             String Body = remoteMessage.getNotification().getBody();
 
+            //NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
             NotificationHelper.displayNotification(getApplicationContext(),Title,Body);
         }
     }

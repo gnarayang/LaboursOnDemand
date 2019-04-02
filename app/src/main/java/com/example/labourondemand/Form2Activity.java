@@ -3,6 +3,7 @@ package com.example.labourondemand;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -94,6 +95,7 @@ public class Form2Activity extends AppCompatActivity {
     private ImageView choose, skillPic;
     private TextView skillText;
     private ProgressBar progressBar;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +121,7 @@ public class Form2Activity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         session = new SessionManager(getApplicationContext());
 
-        progressBar = findViewById(R.id.form2_pb);
+//        progressBar = findViewById(R.id.form2_pb);
 
         skillPic = findViewById(R.id.form2_skill_iv);
         skillText = findViewById(R.id.form2_skill_tv);
@@ -188,7 +190,7 @@ public class Form2Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                progressBar.setVisibility(View.VISIBLE);
+//                progressBar.setVisibility(View.VISIBLE);
                 save_description(v);
             }
         });
@@ -479,6 +481,48 @@ public class Form2Activity extends AppCompatActivity {
                                                                                     });
 
 
+                                                                            firebaseFirestore.collection("labourer").whereArrayContains("skill",servicesFinal.getSkill())
+                                                                                    .get()
+                                                                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                                            for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                                                                                String token = documentSnapshot.getString("token");
+                                                                                                Retrofit retrofit = new Retrofit.Builder()
+                                                                                                        .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                                                                        .addConverterFactory(GsonConverterFactory.create())
+                                                                                                        .build();
+
+                                                                                                Api api = retrofit.create(Api.class);
+                                                                                                String title = "A job is available";
+                                                                                                String body = "Job: "+servicesFinal.getTitle();
+                                                                                                Call<ResponseBody> call = api.sendNotification(token,title,body);
+
+                                                                                                call.enqueue(new Callback<ResponseBody>() {
+                                                                                                    @Override
+                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                        try {
+                                                                                                            Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
+                                                                                                        } catch (IOException e) {
+                                                                                                            e.printStackTrace();
+                                                                                                        }
+                                                                                                    }
+
+                                                                                                    @Override
+                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Log.d(TAG,"Could not get toke!");
+                                                                                        }
+                                                                                    });
+                                                                            onBackPressed();
 
                                                                         }
                                                                     })

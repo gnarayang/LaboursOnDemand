@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -68,9 +69,28 @@ public class CustomerHistoryAdapter extends RecyclerView.Adapter<CustomerHistory
         ServicesFinal service = services.get(viewHolder.getAdapterPosition());
 
         viewHolder.jobcost.setText(String.valueOf(service.getCustomerAmount()));
-        viewHolder.date.setText(service.getEndTime());
+
+        StringTokenizer tokenizer = new StringTokenizer(service.getStartTime(), "/");
+        String stTime = "", stDate = "";
+
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken());
+
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken() + ":");
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken());
+
+
+        viewHolder.date.setText(stDate);
         viewHolder.jobTitle.setText(service.getTitle());
         Glide.with(context).load(service.getImages().get(0)).into(viewHolder.labourerImage);
+        viewHolder.time.setText(stTime);
+
 
         if(service.getSkill().equals("Carpenter"))
         {
@@ -96,7 +116,6 @@ public class CustomerHistoryAdapter extends RecyclerView.Adapter<CustomerHistory
             viewHolder.jobImage.setImageDrawable(context.getDrawable(R.drawable.ic_cooking_colour));
 
         }
-        viewHolder.time.setText(service.getStartTime());
     }
 
     @Override
