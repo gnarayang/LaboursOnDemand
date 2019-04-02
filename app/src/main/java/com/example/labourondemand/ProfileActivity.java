@@ -154,6 +154,8 @@ public class ProfileActivity extends AppCompatActivity
             Glide.with(getApplicationContext())
                     .load(labourer.getImage())
                     .into(photo);
+
+            progressBar.setVisibility(View.GONE);
         } else {
             //
             customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
@@ -167,6 +169,8 @@ public class ProfileActivity extends AppCompatActivity
             Glide.with(getApplicationContext())
                     .load(customer.getImage())
                     .into(photo);
+
+            progressBar.setVisibility(View.GONE);
         }
 
         Log.d(TAG, "labourer" + labourer.getAddressLine1());
@@ -205,8 +209,6 @@ public class ProfileActivity extends AppCompatActivity
                 editfunction();
             }
         });
-
-        progressBar.setVisibility(View.INVISIBLE);
     }
 
 
@@ -330,8 +332,6 @@ public class ProfileActivity extends AppCompatActivity
 
                     if (isInputRight) {
 
-                        progressBar.setVisibility(View.VISIBLE);
-
                         name.setFocusableInTouchMode(false);
                         name.setFocusable(false);
                         //emailid.setFocusableInTouchMode(false);
@@ -411,8 +411,6 @@ public class ProfileActivity extends AppCompatActivity
                             storeFirestore(null);
                         }
 
-                        progressBar.setVisibility(View.INVISIBLE);
-
                     }
                 }
             });
@@ -420,6 +418,8 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     private void storeFirestore(Uri uri) {
+
+        progressBar.setVisibility(View.VISIBLE);
 
         userMap.put("name", name.getText().toString());
         userMap.put("phone", Long.valueOf(phone.getText().toString()));
@@ -486,6 +486,8 @@ public class ProfileActivity extends AppCompatActivity
                         } else {
                             session.saveLabourer(labourer);
                         }
+
+                        progressBar.setVisibility(View.GONE);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -493,6 +495,7 @@ public class ProfileActivity extends AppCompatActivity
                     public void onFailure(@NonNull Exception e) {
                         //String error = task.getException().getMessage();
                         Toast.makeText(ProfileActivity.this, "(FIRESTORE Error) : " + e.toString(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 });
 

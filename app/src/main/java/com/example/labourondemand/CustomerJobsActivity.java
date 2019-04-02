@@ -16,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -42,6 +45,9 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
     private ArrayList<ServicesFinal> currentServices;
     private SessionManager sessionManager;
 
+    private ImageView noJobImage;
+    private TextView noJobtv;
+
 
     @SuppressLint("ResourceType")
     @Override
@@ -53,6 +59,8 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         drawerLayout = findViewById(R.id.customer_jobs_dl);
         navigationView = findViewById(R.id.customer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
+        noJobImage = findViewById(R.id.customer_jobs_iv_no_job);
+        noJobtv = findViewById(R.id.customer_jobs_tv_no_job);
 
         sessionManager = new SessionManager(getApplicationContext());
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -107,19 +115,27 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
 
                         }
                     });
-
-
-        }else{
-            for (int i = 0; i < currentServices.size(); i++) {
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("customer", customer);
-                bundle.putSerializable("service", currentServices.get(i));
-                CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
-                customerJobsFragment.setArguments(bundle);
-                viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
-                viewPagerAdapter.notifyDataSetChanged();
-            }
         }
+
+        if(currentServices.size() == 0) {
+            noJobImage.setVisibility(View.VISIBLE);
+            noJobtv.setVisibility(View.VISIBLE);
+        }
+        else {
+            noJobImage.setVisibility(View.GONE);
+            noJobtv.setVisibility(View.GONE);
+        }
+
+        for (int i = 0; i < currentServices.size(); i++) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("customer", customer);
+            bundle.putSerializable("service", currentServices.get(i));
+            CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
+            customerJobsFragment.setArguments(bundle);
+            viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
+            viewPagerAdapter.notifyDataSetChanged();
+        }
+
         //should be inside a for loop through all fragments
 
         //viewPager.setAdapter(viewPagerAdapter);

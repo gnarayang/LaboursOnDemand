@@ -179,6 +179,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
         mapView = mapFragment.getView();
 
         toolbar = findViewById(R.id.customer_home_tb);
+        toolbar = findViewById(R.id.customer_home_tb);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         drawerLayout = findViewById(R.id.customer_home_dl);
