@@ -141,17 +141,17 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
-                        firebaseFirestore.collection("labourer").document(firebaseAuth.getUid()).update("token",token)
+                        firebaseFirestore.collection("labourer").document(firebaseAuth.getUid()).update("token", token)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Log.d("TOKEN","SUCCESS");
+                                        Log.d("TOKEN", "SUCCESS");
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.d("TOKEN Failure",e.toString());
+                                        Log.d("TOKEN Failure", e.toString());
                                     }
                                 });
                         // Log and toast
@@ -163,7 +163,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d("TOKEN Failure111",e.toString());
+                        Log.d("TOKEN Failure111", e.toString());
 
                     }
                 });
@@ -337,12 +337,12 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                     return true;
                 case R.id.bottom_navigation_history:
                     Intent intent = new Intent(LabourerHomeActivity.this, LabourerHistoryActivity.class);
-                    intent.putExtra("labourer",labourerFinal);
+                    intent.putExtra("labourer", labourerFinal);
                     startActivity(intent);
                     return true;
                 case R.id.bottom_navigation_jobs:
                     Intent intent1 = new Intent(LabourerHomeActivity.this, LabourerMainActivity.class);
-                    intent1.putExtra("labourer",labourerFinal);
+                    intent1.putExtra("labourer", labourerFinal);
                     startActivity(intent1);
                     return true;
             }
@@ -369,27 +369,27 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
         } else if (id == R.id.nav_history) {
 
-            Intent intent = new Intent(LabourerHomeActivity.this,LabourerHomeActivity.class);
-            intent.putExtra("labourer",labourerFinal);
+            Intent intent = new Intent(LabourerHomeActivity.this, LabourerHomeActivity.class);
+            intent.putExtra("labourer", labourerFinal);
             startActivity(intent);
             finish();
 
-        }else if (id == R.id.nav_jobs) {
-            Intent intent = new Intent(this,LabourerMainActivity.class);
-            intent.putExtra("labourer",labourerFinal);
+        } else if (id == R.id.nav_jobs) {
+            Intent intent = new Intent(this, LabourerMainActivity.class);
+            intent.putExtra("labourer", labourerFinal);
             startActivity(intent);
             finish();
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("labourer",labourerFinal);
-            intent.putExtra("type","customer");
+            intent.putExtra("labourer", labourerFinal);
+            intent.putExtra("type", "customer");
             Log.d(tag, "labourer : " + labourerFinal.getAddressLine1());
             startActivity(intent);
-        }  else if (id == R.id.nav_wallet) {
+        } else if (id == R.id.nav_wallet) {
             Intent intent = new Intent(this, WalletActivity.class);
-            Log.d("cbuidbcidbysi",labourerFinal.toString());
-            intent.putExtra("labourer",labourerFinal);
-            intent.putExtra("type","customer");
+            Log.d("cbuidbcidbysi", labourerFinal.toString());
+            intent.putExtra("labourer", labourerFinal);
+            intent.putExtra("type", "customer");
             Log.d(tag, "labourer : " + labourerFinal.getAddressLine1());
             startActivity(intent);
         } else if (id == R.id.nav_send) {
@@ -448,9 +448,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 ServicesFinal servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
                                 double distance = 0;
                                 servicesFinal.setServiceId(documentSnapshot.getId());
-                                servicesFinalForLocation.add(servicesFinal);
                                 //servicesFinal.setCustomerUID(documentSnapshot.getString("customerUID"));
-                                Log.d("I don't know", "+" + servicesFinal.toString() + "!"+ servicesFinal.getDestinationLongitude()+ "!");
+                                Log.d("I don't know", "+" + servicesFinal.toString() + "!" + servicesFinal.getDestinationLongitude() + "!");
                                 //final ServicesFinal finalServices = servicesFinal;
                                 //ServicesFinal finalServicesFinal = servicesFinal;
                                 //firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID())
@@ -468,40 +467,48 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 l2.setLongitude(servicesFinal.getDestinationLongitude());
 
 
-
                                 Log.d("My location", myLocation.toString() + "!");
 //                                Log.d("ser", servicesFinal.getDestinationLatitude() + "!" + servicesFinal.getDestinationLongitude()+"+"+(l1.distanceTo(l2)));
-                                Log.d("Service location",servicesFinal.getDestinationLatitude().toString() + " + " + servicesFinal.getDestinationLongitude().toString());
+                                Log.d("Service location", servicesFinal.getDestinationLatitude().toString() + " + " + servicesFinal.getDestinationLongitude().toString());
                                 serviceLocation.setLatitude(servicesFinal.getDestinationLatitude());
                                 serviceLocation.setLatitude(servicesFinal.getDestinationLatitude());
-                                distance = (l1.distanceTo(l2))/1000;
-                                Log.d("distance",String.valueOf(distance));
+                                distance = (l1.distanceTo(l2)) / 1000;
+                                Log.d("distance", String.valueOf(distance));
                                 if (distance < max_distance) {
                                     double finalDistance = distance;
-                                    firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID()).get()
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onSuccess(DocumentSnapshot documentSnapshot1) {
-                                                    Log.d("doc00", documentSnapshot1.getData() + "!00");
-                                                    //CustomerFinal customerFinal = documentSnapshot1.toObject(CustomerFinal.class);
-                                                    //Log.d("cus", customerFinal.toString() + "!");
-                                                    Log.d("service", servicesFinal.toString() + " hi");
-                                                    //servicesFinal.setCustomer(customerFinal);
-                                                    Bundle bundle = new Bundle();
-                                                    bundle.putSerializable("services", servicesFinal);
-                                                    bundle.putSerializable("labourer", labourerFinal);
-                                                    //Continue coding from here. Pass the location here
-                                                    bundle.putDouble("distance", finalDistance);
-                                                    CardVIewJobs cv = new CardVIewJobs();
-                                                    cv.setArguments(bundle);
-                                                    viewPagerAdapterLabourer.addFragment(cv, "cc");
-                                                    viewPagerAdapterLabourer.notifyDataSetChanged();
-//                                                    if(servicesFinalForLocation.size() == 1)
-//                                                    {
-//                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-//                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
-//                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//
+                                    servicesFinalForLocation.add(servicesFinal);
+                                    Log.d("Added to location", servicesFinal.toString() + "!!!" + servicesFinalForLocation.size());
+                                    if (servicesFinalForLocation.size() == 1) {
+                                        Bundle bundle = new Bundle();
+                                        bundle.putSerializable("services", servicesFinal);
+                                        bundle.putSerializable("labourer", labourerFinal);
+                                        bundle.putDouble("distance", finalDistance);
+                                        CardVIewJobs cv = new CardVIewJobs();
+                                        cv.setArguments(bundle);
+                                        viewPagerAdapterLabourer.addFragment(cv, "cc");
+                                        viewPagerAdapterLabourer.notifyDataSetChanged();
+                                        mMap.clear();
+                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
+                                        Log.d("First location", sydney.toString());
+                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                    }
+                                    else {
+//                                        Log.d("doc00", documentSnapshot1.getData() + "!00");
+                                        //CustomerFinal customerFinal = documentSnapshot1.toObject(CustomerFinal.class);
+                                        //Log.d("cus", customerFinal.toString() + "!");
+                                        Log.d("service", servicesFinal.toString() + " hi");
+                                        //servicesFinal.setCustomer(customerFinal);
+                                        Bundle bundle = new Bundle();
+                                        bundle.putSerializable("services", servicesFinal);
+                                        bundle.putSerializable("labourer", labourerFinal);
+                                        bundle.putDouble("distance", finalDistance);
+                                        CardVIewJobs cv = new CardVIewJobs();
+                                        cv.setArguments(bundle);
+                                        viewPagerAdapterLabourer.addFragment(cv, "cc");
+                                        viewPagerAdapterLabourer.notifyDataSetChanged();
+
+
 //                                                        Location l1 = new Location("");
 //                                                        l1.setLatitude(myLocation.getLatitude());
 //                                                        l1.setLongitude(myLocation.getLongitude());
@@ -513,28 +520,20 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                                                        distance = (l1.distanceTo(l2))/1000;
 //                                                        Log.d("distance",String.valueOf(distance));
 //                                                        bundle.putDouble("distance",distance);
-//
-//                                                    }
-                                                    //viewPager.setAdapter(viewPagerAdapterLabourer);
+                                        //viewPager.setAdapter(viewPagerAdapterLabourer);
 
-                                                    // To add code to add to viewPager
+                                        // To add code to add to viewPager
                                                /* bundles.add(new Bundle());
                                                 bundles.get(j).putString("key", servicesFinal.getCustomerUID());
                                                 cardViewJobs.add(new CardVIewJobs());
                                                 cardViewJobs.get(j).setArguments(bundles.get(j);
                                                 viewPagerAdapter.addFragment(cardViewJobs.get(j), "hello" + j);
                                                 j = j +1;*/
-                                                    //
-                                                    //finalServices.setCustomer(documentSnapshot.toObject(Customer.class));
-                                                    //dashboardAdapter.added(finalServices);
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d(tag, "error fetchService2 : " + e.toString());
-                                                }
-                                            });
+                                        //
+                                        //finalServices.setCustomer(documentSnapshot.toObject(Customer.class));
+                                        //dashboardAdapter.added(finalServices);
+                                    }
+
                                 }
 
                             }
@@ -603,19 +602,15 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             //fetchServices(Double.POSITIVE_INFINITY);
-        }
-        else if (position == 1)
-        {
+        } else if (position == 1) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 1.0;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
 //                Log.d("service onMapReady", "yessss");
 //            }
-                    Log.d("value of distance", max.toString());
+            Log.d("value of distance", max.toString());
             fetchServices(max);
-        }
-        else if (position == 2)
-        {
+        } else if (position == 2) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 2.0;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
@@ -623,9 +618,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //            }
             Log.d("value of distance", max.toString());
             fetchServices(max);
-        }
-        else if (position == 3)
-        {
+        } else if (position == 3) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 3.0;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
@@ -633,9 +626,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //            }
             Log.d("value of distance", max.toString());
             fetchServices(max);
-        }
-        else if (position == 4)
-        {
+        } else if (position == 4) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 5.0;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
@@ -643,9 +634,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //            }
             Log.d("value of distance", max.toString());
             fetchServices(max);
-        }
-        else if (position == 5)
-        {
+        } else if (position == 5) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 10.0;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
@@ -653,8 +642,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //            }
             Log.d("value of distance", max.toString());
             fetchServices(max);
-        }
-        else if (position == 6) {
+        } else if (position == 6) {
             Log.d("item", "vvfdvdv");
             max = Double.POSITIVE_INFINITY;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
