@@ -17,15 +17,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.labourondemand.notifications.Api;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.squareup.okhttp.ResponseBody;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 /**
@@ -147,9 +157,51 @@ public class ServiceAmountFragment extends Fragment {
                                     HashMap<String, String> lab = new HashMap<>();
                                     lab.put("currentService", sid);
 
-                                    progressBar.setVisibility(View.GONE);
-                                    Toast.makeText(view.getContext(),"Applied for the Service",Toast.LENGTH_LONG).show();
-                                    getActivity().onBackPressed();
+                                    firebaseFirestore.collection("customer").document(services.getCustomerUID())
+                                            .get()
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    String token = documentSnapshot.getString("token");
+                                                    Retrofit retrofit = new Retrofit.Builder()
+                                                            .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                            .addConverterFactory(GsonConverterFactory.create())
+                                                            .build();
+
+                                                    Api api = retrofit.create(Api.class);
+                                                    String title = services.getTitle();
+                                                    String body = "A labourer applied for your job";
+                                                    Call<ResponseBody> call = api.sendNotification(token,title,body);
+
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(view.getContext(),"Applied for the Service",Toast.LENGTH_LONG).show();
+                                                    getActivity().onBackPressed();
+
+                                                    call.enqueue(new Callback<ResponseBody>() {
+                                                        @Override
+                                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                            try {
+                                                                Toast.makeText(view.getContext(),response.body().string(),Toast.LENGTH_LONG).show();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+
+                                                        @Override
+                                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                        }
+                                                    });
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                }
+                                            });
+
+
 
                                     /*firebaseFirestore.collection("labourer").document(firebaseAuth.getUid())
                                             .set(lab, SetOptions.merge())

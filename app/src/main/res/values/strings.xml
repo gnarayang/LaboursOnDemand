@@ -29,6 +29,17 @@
 
     </string-array>
 
+    <string-array name="array_distances">
+        <item>none</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>infinity</item>
+
+    </string-array>
+
     <!-- <integer-array name="pics">
         <item>@drawable/selector_carpenter</item>
         <item>@drawable/selector_plumber</item>
@@ -54,6 +65,5 @@
     <string name="title_history">History</string>
     <string name="title_jobs">Jobs</string>
     <string name="title_activity_maps">Map</string>
-    <string name="title_activity_maps2">Map</string>
 
 </resources>

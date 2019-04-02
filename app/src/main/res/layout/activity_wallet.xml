@@ -33,13 +33,29 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_larger"
             android:background="@color/orange"
+            android:text="Check Balance"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:text="Check Balance"
-            android:textColor="@color/white"/>
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/wallet_btn_update_balance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_larger"
+            android:background="@color/orange"
+            android:text="Update Balance"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wallet_btn_check_balance" />
 
         <TextView
+            android:visibility="visible"
             android:id="@+id/tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,21 +65,23 @@
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/wallet_btn_check_balance" />
+            app:layout_constraintTop_toBottomOf="@+id/wallet_btn_update_balance" />
 
         <TextView
+            android:visibility="visible"
             android:id="@+id/wallet_tv_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_larger"
             android:layout_marginStart="8dp"
-            android:visibility="gone"
+            android:layout_marginTop="8dp"
             android:drawableLeft="@drawable/ic_rupee"
             android:inputType="number"
+            android:text="0"
             android:textSize="@dimen/text_size_large"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/tv"
-            app:layout_constraintTop_toBottomOf="@+id/wallet_btn_check_balance" />
+            app:layout_constraintTop_toBottomOf="@+id/wallet_btn_update_balance" />
 
     </android.support.constraint.ConstraintLayout>
 

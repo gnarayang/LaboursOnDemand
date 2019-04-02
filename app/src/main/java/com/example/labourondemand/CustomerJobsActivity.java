@@ -167,37 +167,37 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
-        } else if (id == R.id.nav_history) {
-            //Toast.makeText(this,"History yet to be Developed",)
-            Intent intent = new Intent(this, PreviousActivity.class);
+            Intent intent = new Intent(CustomerJobsActivity.this,CustomerHomeActivity.class);
+            intent.putExtra("customer",customer);
             startActivity(intent);
+            finish();
+        } else if (id == R.id.nav_history) {
+            Intent intent = new Intent(CustomerJobsActivity.this,CustomerHistoryActivity.class);
+            intent.putExtra("customer",customer);
+            startActivity(intent);
+            finish();
+        }else if (id == R.id.nav_jobs) {
+
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            /*Bundle bundle = new Bundle();
-            bundle.putParcelable("labourer",labourer);*//*
-            intent.putExtra("user", labourer);
-            intent.putExtra("type","labourer");
-            Log.d(tag, "labourer : " + labourer.getAddressLine1());*/
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_manage) {
-            //Intent settings = new Intent(LabourerMainActivity.this,SettingsActivity.class);
-            //startActivity(settings);
-
-        } else if (id == R.id.nav_share) {
-
+        }  else if (id == R.id.nav_wallet) {
+            Intent intent = new Intent(this, WalletActivity.class);
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-
             firebaseAuth.signOut();
             sessionManager.logoutUser();
             Intent intent = new Intent(CustomerJobsActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_wallet) {
-            /*Intent intent = new Intent(CustomerHistoryActivity.this, NAME.class);
-            startActivity(intent);*/
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

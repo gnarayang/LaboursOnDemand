@@ -2,6 +2,8 @@ package com.example.labourondemand;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -53,6 +55,7 @@ public class CardVIewJobs extends Fragment {
     private FirebaseAuth firebaseAuth;
     private CustomerFinal customerFinal;
     private LabourerFinal labourerFinal;
+    private long distance;
     public CardVIewJobs() {
         // Required empty public constructor
     }
@@ -85,9 +88,10 @@ public class CardVIewJobs extends Fragment {
         Bundle bundle = this.getArguments();
         if(bundle != null) {
             Log.d(TAG, "onCreate: having fun");
-           // display = bundle.getString("key", "Error");
+            // display = bundle.getString("key", "Error");
             servicesFinal = (ServicesFinal) bundle.get("services");
             labourerFinal = (LabourerFinal) bundle.get("labourer");
+            distance = (long) bundle.getDouble("distance");
             Log.d(TAG, "onCreate: servicesFinal: " + servicesFinal.toString()+"!");
         }
 
@@ -115,12 +119,15 @@ public class CardVIewJobs extends Fragment {
 //            //display = bundle.getString("key","Error");
 //        }
         //if(servicesFinal != null)
-       // {
-            Log.d("service passed",  servicesFinal.toString()+"!");
+        // {
+        Log.d("service passed",  servicesFinal.toString()+"!");
         //}
         TextView amount = view.findViewById(R.id.fragment_card_view_jobs_tv_customer_amount);
         amount.setText(servicesFinal.getCustomerAmount().toString());
         customerFinal = (CustomerFinal)fetchCustomer(servicesFinal.getCustomerUID());
+        TextView dis = view.findViewById(R.id.fragment_card_view_jobs_tv_distance);
+        distance = Math.round(distance);
+        dis.setText(String.valueOf(distance) + " kms");
         //Log.d("NULL?",servicesFinal.getCustomerUID());
         Log.d("Service info", servicesFinal.getCustomerUID());
 
@@ -205,24 +212,25 @@ public class CardVIewJobs extends Fragment {
                             if(customerFinal.getImage() != "null"){
                                 Glide.with(view.getContext()).load(customerFinal.getImage()).into(image);
                             }
-//                            if(servicesFinal.getSkill().equals("Carpenter")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(ic_carpenter_tools_colour,null,null,null);
-//                            }
-//                            if(servicesFinal.getSkill().equals("Plumber")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(ic_plumber_tools,null,null,null);
-//                            }
-//                            if(servicesFinal.getSkill().equals("Electrician")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_electric_colour,null,null,null);
-//                            }
-//                            if(servicesFinal.getSkill().equals("Painter")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_paint_roller,null,null,null);
-//                            }
-//                            if(servicesFinal.getSkill().equals("Constructor")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_construction_colour,null,null,null);
-//                            }
-//                            if(servicesFinal.getSkill().equals("Chef")) {
-//                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_cooking_colour,null,null,null);
-//                            }
+                            if(servicesFinal.getSkill().equals("Carpenter")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_carpenter_tools_colour,0,0,0);
+                            }
+                            if(servicesFinal.getSkill().equals("Plumber")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(ic_plumber_tools,0,0,0);
+                            }
+                            if(servicesFinal.getSkill().equals("Electrician")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_electric_colour,0,0,0);
+                            }
+                            if(servicesFinal.getSkill().equals("Painter")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_paint_roller,0,0,0);
+                            }
+                            if(servicesFinal.getSkill().equals("Constructor")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_construction_colour,0,0,0);
+                            }
+                            if(servicesFinal.getSkill().equals("Chef")) {
+                                title.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_cooking_colour,0,0,0);
+                            }
+
                         } else {
                             Log.d("not fetched", "null");
                         }
@@ -231,7 +239,7 @@ public class CardVIewJobs extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                            Log.d("onFailure","null");
+                        Log.d("onFailure","null");
                     }
                 });
         return customerFinal;

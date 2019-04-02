@@ -345,7 +345,7 @@ public class SetupActivity extends AppCompatActivity /*implements DetailsSetupFr
         userMap.put("addressLine2", a2.getText().toString());
         userMap.put("addressLine3", a3.getText().toString());
         userMap.put("dob", dob.getText().toString());
-        userMap.put("wallet", 0L);
+        userMap.put("wallet", 10000L);
 
         if (type.equals("labourer")) {
             userMap.put("skill", selectedStrings);
@@ -355,13 +355,13 @@ public class SetupActivity extends AppCompatActivity /*implements DetailsSetupFr
             ,Long.valueOf(workExperience.getText().toString()));*/
             labourerFinal = new LabourerFinal(userId, name.getText().toString(), image, dob.getText().toString(), city.getText().toString(),
                     state.getText().toString(), a1.getText().toString(), a2.getText().toString(), a3.getText().toString(),
-                    Long.valueOf(phone.getText().toString()), 0L, new ArrayList<String>(),false,selectedStrings,
+                    Long.valueOf(phone.getText().toString()), 10000L, new ArrayList<String>(),false,selectedStrings,
                     Long.valueOf(workExperience.getText().toString()), session.getEmail(), session.getPassword());
 
         } else {
             customerFinal = new CustomerFinal(userId, name.getText().toString(), image, dob.getText().toString(), city.getText().toString(),
                     state.getText().toString(), a1.getText().toString(), a2.getText().toString(), a3.getText().toString(),
-                    Long.valueOf(phone.getText().toString()), 0L, new ArrayList<String>(),session.getEmail(), session.getPassword());
+                    Long.valueOf(phone.getText().toString()), 10000L, new ArrayList<String>(),session.getEmail(), session.getPassword());
             /*session.createProfileCustomer(name.getText().toString(),"null",dob.getText().toString(),city.getText().toString(),state.getText().toString(),
                     Long.valueOf(phone.getText().toString()),a1.getText().toString(),a2.getText().toString(),a3.getText().toString());*/
         }

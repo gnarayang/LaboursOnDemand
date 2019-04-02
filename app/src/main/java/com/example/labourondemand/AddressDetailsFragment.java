@@ -62,15 +62,15 @@ public class AddressDetailsFragment extends Fragment {
             type = bundle.getString("type");
 
             if(type.equals("customer")){
-                customer = bundle.getParcelable("customer");
+                customer = (CustomerFinal) bundle.getSerializable("customer");
             }else{
-                labourer = bundle.getParcelable("labourer");
+                labourer = (LabourerFinal) bundle.getSerializable("labourer");
             }
         }
     }
 
-    private Labourer labourer = new Labourer();
-    private Customer customer = new Customer();
+    private LabourerFinal labourer = new LabourerFinal();
+    private CustomerFinal customer = new CustomerFinal();
     private String type;
     private EditText a1,a2,a3,city,state;
 

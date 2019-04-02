@@ -38,9 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/payment_abl">
 
-        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/parent_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -70,6 +68,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/payment_end_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,6 +82,7 @@
                 tools:layout_editor_absoluteY="48dp" />
 
             <TextView
+                android:id="@+id/payment_numOfLabourers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_larger"
@@ -94,6 +94,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/payment_end_time" />
 
             <TextView
+                android:visibility="gone"
                 android:id="@+id/payment_cost_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -114,14 +115,15 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/payment_rv"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:orientation="horizontal"
-        android:padding="8dp"
         android:foregroundGravity="center"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/payment_cv">
@@ -129,15 +131,16 @@
     </android.support.v7.widget.RecyclerView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
+        android:layout_marginTop="@dimen/margin_larger"
         android:layout_marginEnd="@dimen/margin_large"
-        app:layout_constraintBottom_toTopOf="@+id/payment_pay_btn"
+        android:elevation="@dimen/margin_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/payment_pb"
-        android:elevation="@dimen/margin_large">
+        app:layout_constraintTop_toBottomOf="@+id/payment_rv">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -154,7 +157,7 @@
                 android:drawableLeft="@drawable/ic_cash"
                 android:drawablePadding="@dimen/margin_larger"
                 android:gravity="center"
-                android:text="64652"
+                android:text="1200"
                 android:textSize="@dimen/text_size_larger"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -165,6 +168,17 @@
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/payment_update_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_larger"
+        android:layout_marginTop="@dimen/margin_larger"
+        android:text="Update Balance !!"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView" />
 
     <Button
         android:id="@+id/payment_pay_btn"
@@ -182,7 +196,7 @@
         android:id="@+id/payment_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"

@@ -32,17 +32,21 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.labourondemand.notifications.Api;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.okhttp.ResponseBody;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -55,6 +59,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 import id.zelory.compressor.Compressor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Form2Activity extends AppCompatActivity {
 
@@ -423,7 +432,53 @@ public class Form2Activity extends AppCompatActivity {
                                                                             customer.getIncomingServices().add(servicesFinal);
                                                                             session.saveServices(servicesFinal);
                                                                             session.saveCustomer(customer);
-                                                                            onBackPressed();
+                                                                            firebaseFirestore.collection("labourer").whereArrayContains("skill",servicesFinal.getSkill())
+                                                                                    .get()
+                                                                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                                            int i =0;
+                                                                                            for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                                                                                i++;
+                                                                                                String token = documentSnapshot.getString("token");
+                                                                                                Retrofit retrofit = new Retrofit.Builder()
+                                                                                                        .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                                                                        .addConverterFactory(GsonConverterFactory.create())
+                                                                                                        .build();
+
+                                                                                                Api api = retrofit.create(Api.class);
+                                                                                                String title = "A job is available";
+                                                                                                String body = "Job: "+servicesFinal.getTitle();
+                                                                                                Call<ResponseBody> call = api.sendNotification(token,title,body);
+                                                                                                if(i == queryDocumentSnapshots.size()){
+                                                                                                    onBackPressed();
+                                                                                                }
+                                                                                                call.enqueue(new Callback<ResponseBody>() {
+                                                                                                    @Override
+                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                        try {
+                                                                                                            Toast.makeText(getApplicationContext(),response.body().string(),Toast.LENGTH_LONG).show();
+                                                                                                        } catch (IOException e) {
+                                                                                                            e.printStackTrace();
+                                                                                                        }
+                                                                                                    }
+
+                                                                                                    @Override
+                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Log.d(TAG,"Could not get toke!");
+                                                                                        }
+                                                                                    });
+
+
 
                                                                         }
                                                                     })

@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import static com.example.labourondemand.R.drawable.ic_plumber_tools;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,11 +65,10 @@ public class ServiceDescriptionFragment extends Fragment {
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             services = (ServicesFinal) bundle.getSerializable("services");
-
         }
     }
 
-    private TextView tags, description, skill;
+    private TextView tags, description, skill, startTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,9 +78,30 @@ public class ServiceDescriptionFragment extends Fragment {
         skill = view.findViewById(R.id.service_description_tv_skill);
         description = view.findViewById(R.id.service_description_tv_description);
         tags = view.findViewById(R.id.service_description_tv_tags);
-
+        startTime = view.findViewById(R.id.service_description_tv_start_time_fill);
         skill.setText(services.getSkill().toString());
         description.setText(services.getDescription().toString());
+        tags.setText(services.getTitle());
+        startTime.setText(services.getStartTime());
+        if(services.getSkill().equals("Carpenter")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_carpenter_tools_colour);
+        }
+        if(services.getSkill().equals("Plumber")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,ic_plumber_tools);
+        }
+        if(services.getSkill().equals("Electrician")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_electric_colour);
+        }
+        if(services.getSkill().equals("Painter")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_paint_roller);
+        }
+        if(services.getSkill().equals("Constructor")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_construction_colour);
+        }
+        if(services.getSkill().equals("Chef")) {
+            skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_cooking_colour);
+        }
+        TextView distance = view.findViewById(R.id.fragment_card_view_jobs_tv_distance);
         return view;
     }
 

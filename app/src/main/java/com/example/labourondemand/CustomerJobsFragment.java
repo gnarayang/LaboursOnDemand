@@ -102,6 +102,7 @@ public class CustomerJobsFragment extends Fragment {
     private ImageView skillPic;
     private Button done, sortPrice, sortRating;
     private TextView jobTitle, jobDescription, startTime, startDate;
+    private ImageView badLabourer;
     private SessionManager sessionManager;
 
     @Override
@@ -139,12 +140,61 @@ public class CustomerJobsFragment extends Fragment {
         StringTokenizer tokenizer = new StringTokenizer(currentService.getStartTime(), "/");
         String stTime = "", stDate = "";
 
+        String year = "", month = "", day = "";
+
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken() + "/");
+            year = tokenizer.nextToken();
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken() + "/");
+            month = tokenizer.nextToken();
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken());
+            day = tokenizer.nextToken();
+
+        stDate += (day + " ");
+
+        switch(month) {
+            case "1":
+                stTime += "Jan";
+                break;
+            case "2":
+                stTime += "Feb";
+                break;
+            case "3":
+                stTime += "Mar";
+                break;
+            case "4":
+                stTime += "Apr";
+                break;
+            case "5":
+                stTime += "May";
+                break;
+            case "6":
+                stTime += "June";
+                break;
+            case "7":
+                stTime += "July";
+                break;
+            case "8":
+                stTime += "Aug";
+                break;
+            case "9":
+                stTime += "Sep";
+                break;
+            case "10":
+                stTime += "Oct";
+                break;
+            case "11":
+                stTime += "Nov";
+                break;
+            case "12":
+                stTime += "Dec";
+                break;
+            default:
+                stTime += "Inv";
+        }
+
+        stDate += (" " + year);
+
+
 
         //format to indian form date
 //        String pattern = "dd/MM/yyyy";
@@ -289,6 +339,10 @@ public class CustomerJobsFragment extends Fragment {
             }
         });
 
+
+        //for no labourer response
+        badLabourer = view.findViewById(R.id.customer_jobs_bad_emp_iv);
+
         firebaseFirestore.collection("services").document(currentService.getServiceId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
@@ -311,6 +365,10 @@ public class CustomerJobsFragment extends Fragment {
                             customerJobsAdapter.setService(updatedService);
 
                             if (updatedService.getLabourerResponses() != null) {
+
+                                //nad labourer image
+                                badLabourer.setVisibility(View.GONE);
+
                                 for (String s : updatedService.getLabourerResponses().keySet()) {
 
                                     firebaseFirestore.collection("labourer").document(s)
@@ -337,6 +395,7 @@ public class CustomerJobsFragment extends Fragment {
                                 customerJobsAdapter.addLabourer(labourersToBeAdded.get(i));
                             }*/
                         } else {
+                            badLabourer.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Current data: null");
                         }
 

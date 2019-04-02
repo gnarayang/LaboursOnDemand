@@ -26,8 +26,8 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.item_service_tv_title);
-            photo = view.findViewById(R.id.item_service_civ_photo);
+            name = view.findViewById(R.id.item_review_labourer_tv);
+            photo = view.findViewById(R.id.item_review_labourer_civ);
         }
     }
 
@@ -42,7 +42,7 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         LayoutInflater inflater = LayoutInflater.from(context);
-        view = inflater.inflate(R.layout.item_labourer, parent, false);
+        view = inflater.inflate(R.layout.item_review_labourer, parent, false);
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }

@@ -70,7 +70,7 @@ public class CheckingActivity extends AppCompatActivity {
                                     Log.d("isSetup", "customer");
 
                                     CustomerFinal customerFinal = session.getCustomer(current_user_id);
-
+                                    Log.d("customer is checking",customerFinal.toString());
                                     if (customerFinal.getNotPaidService() != null) {
                                         Intent intent = new Intent(CheckingActivity.this, PaymentActivity.class);
                                         intent.putExtra("customer", customerFinal);
@@ -96,12 +96,31 @@ public class CheckingActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                     if (documentSnapshot.exists()) {
-                                                        CustomerFinal customer = documentSnapshot.toObject(CustomerFinal.class);
-                                                        customer.setId(documentSnapshot.getId());
-                                                        session.saveCustomer(customer);
-                                                        Intent intent = new Intent(CheckingActivity.this, CustomerHomeActivity.class);
-                                                        intent.putExtra("customer", customer);
-                                                        startActivity(intent);
+
+                                                        CustomerFinal customerFinal = documentSnapshot.toObject(CustomerFinal.class);
+                                                        customerFinal.setId(documentSnapshot.getId());
+                                                        session.saveCustomer(customerFinal);
+
+                                                        if (customerFinal.getNotPaidService() != null) {
+                                                            Intent intent = new Intent(CheckingActivity.this, PaymentActivity.class);
+                                                            intent.putExtra("customer", customerFinal);
+                                                            Log.d("Check","PAYMENT");
+                                                            startActivity(intent);
+                                                            finish();
+                                                        } else if (customerFinal.getNotReviewedService() != null) {
+                                                            Intent intent = new Intent(CheckingActivity.this, ReviewActivity2.class);
+                                                            intent.putExtra("customer", customerFinal);
+                                                            Log.d("Check","Review2");
+                                                            startActivity(intent);
+                                                            finish();
+                                                        } else {
+                                                            Intent intent = new Intent(CheckingActivity.this, CustomerHomeActivity.class);
+                                                            intent.putExtra("customer", customerFinal);
+                                                            Log.d("Check","CUSTOMEHOME");
+                                                            startActivity(intent);
+                                                            finish();
+                                                        }
+
 
                                                     } else {
                                                         Intent customer = new Intent(CheckingActivity.this, SetupActivity.class);
