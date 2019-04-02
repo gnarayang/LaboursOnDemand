@@ -55,7 +55,7 @@ public class CardVIewJobs extends Fragment {
     private FirebaseAuth firebaseAuth;
     private CustomerFinal customerFinal;
     private LabourerFinal labourerFinal;
-    private long distance;
+    private double distance;
     public CardVIewJobs() {
         // Required empty public constructor
     }
@@ -91,7 +91,8 @@ public class CardVIewJobs extends Fragment {
             // display = bundle.getString("key", "Error");
             servicesFinal = (ServicesFinal) bundle.get("services");
             labourerFinal = (LabourerFinal) bundle.get("labourer");
-            distance = (long) bundle.getDouble("distance");
+            distance = bundle.getDouble("distance");
+            Log.d("ImmediatelyAfterReceive", String.valueOf(distance));
             Log.d(TAG, "onCreate: servicesFinal: " + servicesFinal.toString()+"!");
         }
 
@@ -126,7 +127,9 @@ public class CardVIewJobs extends Fragment {
         amount.setText(servicesFinal.getCustomerAmount().toString());
         customerFinal = (CustomerFinal)fetchCustomer(servicesFinal.getCustomerUID());
         TextView dis = view.findViewById(R.id.fragment_card_view_jobs_tv_distance);
-        distance = Math.round(distance);
+        Log.d("distance in cardView",String.valueOf(distance));
+        distance = (Math.round(distance*100.0)/100.0);
+        Log.d("distance after rounding",String.valueOf(distance));
         dis.setText(String.valueOf(distance) + " kms");
         //Log.d("NULL?",servicesFinal.getCustomerUID());
         Log.d("Service info", servicesFinal.getCustomerUID());
