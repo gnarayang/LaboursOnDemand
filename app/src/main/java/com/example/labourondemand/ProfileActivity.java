@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -34,20 +35,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.api.LogDescriptor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class ProfileActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, PersonalDetailsFragment.OnFragmentInteractionListener,
+        implements /*NavigationView.OnNavigationItemSelectedListener,*/ PersonalDetailsFragment.OnFragmentInteractionListener,
         WorkDetailsFragment.OnFragmentInteractionListener, AddressDetailsFragment.OnFragmentInteractionListener {
 
     private DrawerLayout drawerLayout;
@@ -62,16 +75,17 @@ public class ProfileActivity extends AppCompatActivity
     private FirebaseStorage storage;
     private Uri mainImageURI;
     private ArrayList<Uri> pictures = new ArrayList<>();
-    private Customer customer;
+    private CustomerFinal customer;
     private FirebaseFirestore firebaseFirestore;
     private StorageReference storageReference;
     private FirebaseAuth firebaseAuth;
     private Slide slide;
     private Bitmap compressedImageFile;
+    private SessionManager session;
 
     private String TAG = ProfileActivity.class.getName();
     private Boolean isLabourer = false, isEditable;
-    private Labourer labourer = new Labourer();
+    private LabourerFinal labourer = new LabourerFinal();
     private TextView name;
     private CircleImageView photo;
     private ProgressBar progressBar;
@@ -80,6 +94,8 @@ public class ProfileActivity extends AppCompatActivity
     private Button submit;
     private ImageView edit;
     private TabLayout tabLayout;
+    private Map<String, Object> userMap;
+
 
     @SuppressLint("ResourceType")
     @Override
@@ -87,17 +103,33 @@ public class ProfileActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        toolbar = findViewById(R.id.profile_tb);
-        drawerLayout = findViewById(R.id.profile_dl);
-        navigationView = findViewById(R.id.profile_nav);
-        setSupportActionBar(toolbar);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        userMap = new HashMap<>();
+        session = new SessionManager(getApplicationContext());
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        toolbar = findViewById(R.id.profile_tb);
+       /* drawerLayout = findViewById(R.id.profile_dl);
+        navigationView = findViewById(R.id.profile_nav);*/
+        setSupportActionBar(toolbar);
+        toolbar.setTitle("Profile Details");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+
+            }
+        });
+
+       /* ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        navigationView.setCheckedItem(2);
-        navigationView.setNavigationItemSelectedListener(this);
+        toggle.syncState();*/
+        /*navigationView.setCheckedItem(2);
+        navigationView.setNavigationItemSelectedListener(this);*/
 
         name = findViewById(R.id.profile_et_name);
         photo = findViewById(R.id.profile_civ_photo);
@@ -113,8 +145,9 @@ public class ProfileActivity extends AppCompatActivity
 
         if (type.equals("labourer")) {
             isLabourer = true;
-            labourer = (Labourer) getIntent().getParcelableExtra("user");
-            bundle.putParcelable("labourer", labourer);
+            labourer = (LabourerFinal) getIntent().getSerializableExtra("labourer");
+            labourer = session.getLabourer(firebaseAuth.getUid());
+            bundle.putSerializable("labourer", labourer);
             bundle.putString("type", "labourer");
             name.setText(labourer.getName());
             Glide.with(getApplicationContext())
@@ -122,9 +155,13 @@ public class ProfileActivity extends AppCompatActivity
                     .into(photo);
         } else {
             //
-            customer = (Customer) getIntent().getParcelableExtra("user");
-            bundle.putParcelable("customer", customer);
+            customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
+            customer = session.getCustomer(firebaseAuth.getUid());
+            bundle.putSerializable("customer", customer);
+            if (customer == null)
+                Log.d(TAG, "onCreate: errorororororo");
             bundle.putString("type", "customer");
+            Log.d(TAG, "onCreate: Customer :" + customer.toString());
             name.setText(customer.getName());
             Glide.with(getApplicationContext())
                     .load(customer.getImage())
@@ -164,7 +201,7 @@ public class ProfileActivity extends AppCompatActivity
                 isEditable = true;
                 submit.setVisibility(View.VISIBLE);
                 edit.setVisibility(View.GONE);
-                editfunction(v);
+                editfunction();
             }
         });
 
@@ -172,7 +209,7 @@ public class ProfileActivity extends AppCompatActivity
     }
 
 
-    public void editfunction(View v) {
+    public void editfunction() {
 
         name = findViewById(R.id.profile_et_name);
         emailid = findViewById(R.id.personal_et_email);
@@ -201,7 +238,7 @@ public class ProfileActivity extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
 
-                    if(isEditable) {
+                    if (isEditable) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                             if (ContextCompat.checkSelfPermission(ProfileActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -225,7 +262,7 @@ public class ProfileActivity extends AppCompatActivity
             dob.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(isEditable) {
+                    if (isEditable) {
                         selectDate(v);
                     }
                 }
@@ -235,7 +272,7 @@ public class ProfileActivity extends AppCompatActivity
                 skill.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(isEditable) {
+                        if (isEditable) {
                             selectSkill(v);
                         }
                     }
@@ -258,37 +295,36 @@ public class ProfileActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(), "Error in PERSONAL!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(name.getText().toString().trim()))  {
+                    if (!isNotEmpty(name.getText().toString().trim())) {
                         name.setError("Name cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in Name!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(address1.getText().toString().trim()))  {
+                    if (!isNotEmpty(address1.getText().toString().trim())) {
                         address1.setError("Address Line 1 cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in ADDRESS!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(address2.getText().toString().trim()))  {
+                    if (!isNotEmpty(address2.getText().toString().trim())) {
                         address2.setError("Address Line 2 cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in ADDRESS!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(address3.getText().toString().trim()))  {
+                    if (!isNotEmpty(address3.getText().toString().trim())) {
                         address3.setError("Address Line 3 cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in ADDRESS!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(city.getText().toString().trim()))  {
+                    if (!isNotEmpty(city.getText().toString().trim())) {
                         city.setError("City cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in ADDRESS!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-                    if(!isNotEmpty(state.getText().toString().trim()))  {
+                    if (!isNotEmpty(state.getText().toString().trim())) {
                         state.setError("State cannot be empty");
                         Toast.makeText(getApplicationContext(), "Error in ADDRESS!", Toast.LENGTH_SHORT).show();
                         isInputRight = false;
                     }
-
 
 
                     if (isInputRight) {
@@ -315,10 +351,148 @@ public class ProfileActivity extends AppCompatActivity
                         submit.setVisibility(View.GONE);
                         edit.setVisibility(View.VISIBLE);
                         isEditable = false;
+
+
+                        if (mainImageURI != null) {
+
+                            File newImageFile = new File(mainImageURI.getPath());
+                            try {
+
+                                compressedImageFile = new Compressor(ProfileActivity.this)
+                                        .setMaxHeight(160)
+                                        .setMaxWidth(120)
+                                        .setQuality(50)
+                                        .compressToBitmap(newImageFile);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            compressedImageFile.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                            byte[] thumbData = baos.toByteArray();
+
+                            final UploadTask image_path = storageReference.child("profile_images").child(firebaseAuth.getUid() + ".jpg").putBytes(thumbData);
+
+                            image_path.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                                    if (task.isSuccessful()) {
+
+                                        storageReference.child("profile_images").child(firebaseAuth.getUid() + ".jpg").getDownloadUrl()
+                                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                    @Override
+                                                    public void onSuccess(Uri uri) {
+                                                        storeFirestore(uri);
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Toast.makeText(ProfileActivity.this, "(IMAGE Error uri) : " + e.toString(), Toast.LENGTH_LONG).show();
+                                                    }
+                                                });
+
+                                    } else {
+
+                                        String error = task.getException().getMessage();
+                                        Toast.makeText(ProfileActivity.this, "(IMAGE Error) : " + error, Toast.LENGTH_LONG).show();
+                                        progressBar.setVisibility(View.INVISIBLE);
+
+                                    }
+                                }
+                            });
+
+                        } else {
+                            storeFirestore(null);
+                        }
+
+
                     }
                 }
             });
         }
+    }
+
+    private void storeFirestore(Uri uri) {
+
+
+        userMap.put("name", name.getText().toString());
+        userMap.put("phone", Long.valueOf(phone.getText().toString()));
+        userMap.put("city", city.getText().toString());
+        userMap.put("state", state.getText().toString());
+        userMap.put("addressLine1", address1.getText().toString());
+        userMap.put("addressLine2", address2.getText().toString());
+        userMap.put("addressLine3", address3.getText().toString());
+        userMap.put("dob", dob.getText().toString());
+
+        String userId = new String();
+
+        if (type.equals("labourer")) {
+            userMap.put("skill", skill.getText().toString());
+            if(uri != null){
+                userMap.put("image",uri.toString());
+                labourer.setImage(uri.toString());
+            }
+
+            labourer.setName(name.getText().toString());
+            labourer.setPhone(Long.valueOf(phone.getText().toString()));
+            labourer.setCity(city.getText().toString());
+            labourer.setState(state.getText().toString());
+            labourer.setAddressLine1(address1.getText().toString());
+            labourer.setAddressLine2(address2.getText().toString());
+            labourer.setAddressLine3(address3.getText().toString());
+            labourer.setDob(dob.getText().toString());
+
+            ArrayList<String> skills = new ArrayList<>();
+            skills.add(skill.getText().toString());
+
+            labourer.setSkill(skills);
+
+            userId = labourer.getId();
+        } else {
+            if(uri != null){
+                userMap.put("image",uri.toString());
+                customer.setImage(uri.toString());
+            }
+            customer.setName(name.getText().toString());
+            customer.setPhone(Long.valueOf(phone.getText().toString()));
+            customer.setCity(city.getText().toString());
+            customer.setState(state.getText().toString());
+            customer.setAddressLine1(address1.getText().toString());
+            customer.setAddressLine2(address2.getText().toString());
+            customer.setAddressLine3(address3.getText().toString());
+            customer.setDob(dob.getText().toString());
+
+            userId = customer.getId();
+        }
+
+        Log.d(TAG, "onClick: Type " + type + " " + userId);
+
+
+        firebaseFirestore.collection(type).document(userId).update(userMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ProfileActivity.this, "The user Settings are updated.", Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "onSuccess: Success!");
+
+                        if (type.equals("customer")) {
+                            session.saveCustomer(customer);
+                        } else {
+                            session.saveLabourer(labourer);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        //String error = task.getException().getMessage();
+                        Toast.makeText(ProfileActivity.this, "(FIRESTORE Error) : " + e.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
     }
 
     public boolean isValidEmail(String email) {
@@ -332,7 +506,7 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     public boolean isNotEmpty(String name) {
-        if(name.length() == 0)
+        if (name.length() == 0)
             return false;
         return true;
     }
@@ -422,9 +596,10 @@ public class ProfileActivity extends AppCompatActivity
         }
     }
 
-    @Override
+  /*  @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        //menu.getItem(0).setVisible(false);
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
         return true;
     }
@@ -442,9 +617,9 @@ public class ProfileActivity extends AppCompatActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
-    @SuppressWarnings("StatementWithEmptyBody")
+   /* @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle menu_bottom_navigation view item clicks here.
@@ -482,5 +657,5 @@ public class ProfileActivity extends AppCompatActivity
 
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
-    }
+    }*/
 }

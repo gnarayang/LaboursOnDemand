@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class    User implements Serializable/*implements Parcelable*/{
 
-    private String name, image, dob, city, state, addressLine1, addressLine2, addressLine3, id;
+    private String name, image, dob, city, state, addressLine1, addressLine2, addressLine3, id, password, email;
     private GeoPoint currentLocation;
     private Long phone,wallet;
     private ArrayList<String> services;
@@ -21,7 +21,7 @@ public class    User implements Serializable/*implements Parcelable*/{
     }
 
     public User(String id, String name, String image, String dob, String city, String state, String addressLine1, String addressLine2,
-                String addressLine3, Long phone, Long wallet, ArrayList<String> services) {
+                String addressLine3, Long phone, Long wallet, ArrayList<String> services, String email, String password) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -34,8 +34,17 @@ public class    User implements Serializable/*implements Parcelable*/{
         this.phone = phone;
         this.wallet = wallet;
         this.services = services;
+        this.email = email;
+        this.password = password;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     /*protected User(Parcel in) {
         name = in.readString();
@@ -208,4 +217,25 @@ public class    User implements Serializable/*implements Parcelable*/{
         this.services = services;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", image='" + image + '\'' +
+                ", dob='" + dob + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", addressLine1='" + addressLine1 + '\'' +
+                ", addressLine2='" + addressLine2 + '\'' +
+                ", addressLine3='" + addressLine3 + '\'' +
+                ", id='" + id + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", currentLocation=" + currentLocation +
+                ", phone=" + phone +
+                ", wallet=" + wallet +
+                ", services=" + services +
+                ", servicesFinal=" + servicesFinal +
+                '}';
+    }
 }

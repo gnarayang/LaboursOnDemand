@@ -15,6 +15,23 @@ public class CustomerFinal extends User implements Serializable {
     private ArrayList<ServicesFinal> historyServices, currentServices, incomingServices;
     private Double destinationLatitude, destinationLongitude;
     private HashMap<String, Marker> labourersLocation;
+    private String notPaidService, notReviewedService;
+
+    public String getNotPaidService() {
+        return notPaidService;
+    }
+
+    public void setNotPaidService(String notPaidService) {
+        this.notPaidService = notPaidService;
+    }
+
+    public String getNotReviewedService() {
+        return notReviewedService;
+    }
+
+    public void setNotReviewedService(String notReviewedService) {
+        this.notReviewedService = notReviewedService;
+    }
 
     @Override
     public String toString() {
@@ -25,6 +42,9 @@ public class CustomerFinal extends User implements Serializable {
                 ", destinationLatitude=" + destinationLatitude +
                 ", destinationLongitude=" + destinationLongitude +
                 ", labourersLocation=" + labourersLocation +
+                ", notPaidService='" + notPaidService + '\'' +
+                ", notReviewedService='" + notReviewedService + '\'' +
+                ", user ='" + super.toString() + '\'' +
                 '}';
     }
 
@@ -32,31 +52,11 @@ public class CustomerFinal extends User implements Serializable {
 
     }
 
-   /* public CustomerFinal(ArrayList<ServicesFinal> historyServices, ArrayList<ServicesFinal> currentServices, ArrayList<ServicesFinal> incomingServices,
-                         GeoPoint destination, HashMap<String, Marker> labourersLocation) {
-        this.historyServices = historyServices;
-        this.currentServices = currentServices;
-        this.incomingServices = incomingServices;
-        this.destination = destination;
-        this.labourersLocation = labourersLocation;
-    }*/
-
-   /* public CustomerFinal(String id, String name, String image, String dob, String city, String state, String addressLine1, String addressLine2,
-                         String addressLine3, Long phone, Long wallet, ArrayList<String> services, ArrayList<ServicesFinal> historyServices,
-                         ArrayList<ServicesFinal> currentServices, ArrayList<ServicesFinal> incomingServices, GeoPoint destination, HashMap<String,
-            Marker> labourersLocation) {
-        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services);
-        this.historyServices = historyServices;
-        this.currentServices = currentServices;
-        this.incomingServices = incomingServices;
-        this.destination = destination;
-        this.labourersLocation = labourersLocation;
-    }*/
 
 
     public CustomerFinal(String id, String name, String image, String dob, String city, String state, String addressLine1, String addressLine2, String addressLine3,
-                         Long phone, Long wallet, ArrayList<String> services) {
-        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services);
+                         Long phone, Long wallet, ArrayList<String> services, String email, String password) {
+        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services, email, password);
         this.historyServices = new ArrayList<ServicesFinal>();
         this.currentServices = new ArrayList<ServicesFinal>();
         this.incomingServices = new ArrayList<ServicesFinal>();

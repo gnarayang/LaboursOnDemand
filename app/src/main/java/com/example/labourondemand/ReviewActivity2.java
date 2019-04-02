@@ -32,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import retrofit2.Call;
@@ -55,14 +56,20 @@ public class ReviewActivity2 extends AppCompatActivity {
     private TextInputLayout feedback;
     private ProgressBar progressBar;
     private CustomerFinal customerFinal;
-    private Context context = this;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review2);
 
-        servicesFinal = (ServicesFinal) getIntent().getExtras().getSerializable("service");
+
+        sessionManager = new SessionManager(getApplicationContext());
+
+        recyclerView = findViewById(R.id.review_rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        servicesFinal = (ServicesFinal) getIntent().getExtras().getSerializable("services");
         customerFinal = (CustomerFinal) getIntent().getExtras().getSerializable("customer");
         toolbar = findViewById(R.id.review_tb);
         toolbar.setTitle("Please Review");
@@ -71,9 +78,9 @@ public class ReviewActivity2 extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);*/
 
         recyclerView = findViewById(R.id.review_rv);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        labourerAdapter = new LabourerAdapter(this,servicesFinal);
-        recyclerView.setAdapter(labourerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        /*labourerAdapter = new LabourerAdapter(this,servicesFinal);
+        recyclerView.setAdapter(labourerAdapter);*/
 
         ratingBar = findViewById(R.id.review_rb);
         submitButton = findViewById(R.id.review_btn_submit);
@@ -88,13 +95,122 @@ public class ReviewActivity2 extends AppCompatActivity {
         LayerDrawable stars = (LayerDrawable) ratingBar.getProgressDrawable();
         stars.getDrawable(2).setColorFilter(Color.parseColor("#ff5722"), PorterDuff.Mode.SRC_ATOP);
 
-        if(servicesFinal.getSkill().equals("Carpenter")){
-            //servicePhoto.setImageDrawable(R.drawable.ic_carpenter_tools_colour);
+        if (servicesFinal == null) {
+            firebaseFirestore.collection("services").document(customerFinal.getNotReviewedService())
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
+                            servicesFinal.setServiceId(documentSnapshot.getId());
+
+                            title.setText(servicesFinal.getTitle());
+                            amount.setText(String.valueOf(servicesFinal.getNumOfLabourers()*servicesFinal.getCustomerAmount()));
+                            endTime.setText(servicesFinal.getEndTime());
+                            if(servicesFinal.getSkill().equals("Carpenter"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_carpenter_tools_colour));
+                            }else if(servicesFinal.getSkill().equals("Plumber"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_plumber_tools));
+                            }else if(servicesFinal.getSkill().equals("Electrician"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_electric_colour));
+                            }else if(servicesFinal.getSkill().equals("Painter"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_paint_roller));
+                            }else if(servicesFinal.getSkill().equals("Constructor"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_construction_colour));
+                            }else if(servicesFinal.getSkill().equals("Chef"))
+                            {
+                                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_cooking_colour));
+                            }
+
+                            servicesFinal.setSelectedLabourers(new ArrayList<>());
+                            Log.d("servic Payment",servicesFinal.toString()+"!");
+                            labourerAdapter = new LabourerAdapter(getApplicationContext(), servicesFinal);
+                            recyclerView.setAdapter(labourerAdapter);
+                            for (String s : servicesFinal.getSelectedLabourerUID()) {
+
+                                firebaseFirestore.collection("labourer").document(s)
+                                        .get()
+                                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                LabourerFinal labourerFinal = documentSnapshot.toObject(LabourerFinal.class);
+                                                labourerFinal.setId(documentSnapshot.getId());
+                                                labourerAdapter.added(labourerFinal);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+                            }
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+        } else {
+
+            title.setText(servicesFinal.getTitle());
+            amount.setText(String.valueOf(servicesFinal.getNumOfLabourers()*servicesFinal.getCustomerAmount()));
+            endTime.setText(servicesFinal.getEndTime());
+            if(servicesFinal.getSkill().equals("Carpenter"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_carpenter_tools_colour));
+            }else if(servicesFinal.getSkill().equals("Plumber"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_plumber_tools));
+            }else if(servicesFinal.getSkill().equals("Electrician"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_electric_colour));
+            }else if(servicesFinal.getSkill().equals("Painter"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_paint_roller));
+            }else if(servicesFinal.getSkill().equals("Constructor"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_construction_colour));
+            }else if(servicesFinal.getSkill().equals("Chef"))
+            {
+                servicePhoto.setImageDrawable(getDrawable(R.drawable.ic_cooking_colour));
+            }
+
+            servicesFinal.setSelectedLabourers(new ArrayList<LabourerFinal>());
+            Log.d("payment SELECTEDLABOUR ",servicesFinal.toString()+"!");
+            labourerAdapter = new LabourerAdapter(this, servicesFinal);
+            recyclerView.setAdapter(labourerAdapter);
+
+            for (String s : servicesFinal.getSelectedLabourerUID()) {
+
+                firebaseFirestore.collection("labourer").document(s)
+                        .get()
+                        .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                LabourerFinal labourerFinal = documentSnapshot.toObject(LabourerFinal.class);
+                                labourerFinal.setId(documentSnapshot.getId());
+                                labourerAdapter.added(labourerFinal);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+            }
+
         }
 
-        title.setText(servicesFinal.getTitle());
-        amount.setText(String.valueOf(servicesFinal.getNumOfLabourers()*servicesFinal.getCustomerAmount()));
-        endTime.setText(servicesFinal.getEndTime());
 
         submitButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
@@ -135,7 +251,7 @@ public class ReviewActivity2 extends AppCompatActivity {
                                                 @Override
                                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                                     try {
-                                                        Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
+                                                        Toast.makeText(getApplicationContext(),response.body().string(),Toast.LENGTH_LONG).show();
                                                     } catch (IOException e) {
                                                         e.printStackTrace();
                                                     }
@@ -156,36 +272,61 @@ public class ReviewActivity2 extends AppCompatActivity {
                                     });
                         }
                     }
+                    }
                 }
-            }
         });
 
     }
 
     private void submitReview() {
-
+        progressBar.setVisibility(View.VISIBLE);
         String feedbackString = feedback.getEditText().getText().toString();
         float ratingFloat = ratingBar.getRating();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         HashMap<String, Object> map = new HashMap<>();
         map.put("rating", ratingFloat);
         map.put("feedback",feedbackString);
+        map.put("status","history");
+        map.put("isPaid",true);
 
         firebaseFirestore.collection("services").document(servicesFinal.getServiceId())
                 .update(map)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("success review","yes");
-                        Intent intent = new Intent(ReviewActivity2.this,CustomerHomeActivity.class);
-                        intent.putExtra("customer",customerFinal);
-                        startActivity(intent);
-                        finish();
+
+                        firebaseFirestore.collection("customer").document(customerFinal.getId())
+                                .update("notReviewedService",null)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                        progressBar.setVisibility(View.GONE);
+                                        customerFinal.setNotReviewedService(null);
+                                        sessionManager.saveCustomer(customerFinal);
+                                        Log.d("success review","yes");
+                                        Intent intent = new Intent(ReviewActivity2.this,CustomerHomeActivity.class);
+                                        intent.putExtra("customer",customerFinal);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        progressBar.setVisibility(View.GONE);
+                                        Log.d("failure",e.toString());
+
+
+                                    }
+                                });
+
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        progressBar.setVisibility(View.GONE);
                         Log.d("failure",e.toString());
                     }
                 });

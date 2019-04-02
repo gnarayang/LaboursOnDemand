@@ -53,6 +53,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
     private Context context;
     private static final String TAG = "CustomerHistoryActivity";
     private CustomerHistoryAdapter customerHistoryAdapter;
+    private SessionManager sessionManager;
 //    private CustomerFinal customer;
 
 
@@ -63,7 +64,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         setContentView(R.layout.activity_customer_history);
 
         customer = (CustomerFinal) getIntent().getExtras().getSerializable("customer");
-
+        sessionManager = new SessionManager(getApplicationContext());
         toolbar = findViewById(R.id.customer_history_tb);
         drawerLayout = findViewById(R.id.customer_history_dl);
         navigationView = findViewById(R.id.customer_history_nv);
@@ -192,36 +193,37 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
-        } else if (id == R.id.nav_history) {
-            //Toast.makeText(this,"History yet to be Developed",)
-            Intent intent = new Intent(this, PreviousActivity.class);
+            Intent intent = new Intent(CustomerHistoryActivity.this,CustomerHomeActivity.class);
+            intent.putExtra("customer",customer);
             startActivity(intent);
+            finish();
+        } else if (id == R.id.nav_history) {
+
+        }else if (id == R.id.nav_jobs) {
+            Intent intent = new Intent(CustomerHistoryActivity.this,CustomerJobsActivity.class);
+            intent.putExtra("customer",customer);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            /*Bundle bundle = new Bundle();
-            bundle.putParcelable("labourer",labourer);*//*
-            intent.putExtra("user", labourer);
-            intent.putExtra("type","labourer");
-            Log.d(tag, "labourer : " + labourer.getAddressLine1());*/
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_manage) {
-            //Intent settings = new Intent(LabourerMainActivity.this,SettingsActivity.class);
-            //startActivity(settings);
-
-        } else if (id == R.id.nav_share) {
-
+        }  else if (id == R.id.nav_wallet) {
+            Intent intent = new Intent(this, WalletActivity.class);
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-
             firebaseAuth.signOut();
+            sessionManager.logoutUser();
             Intent intent = new Intent(CustomerHistoryActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_wallet) {
-            /*Intent intent = new Intent(CustomerHistoryActivity.this, NAME.class);
-            startActivity(intent);*/
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -250,3 +252,4 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         return super.onOptionsItemSelected(item);
     }
 }
+

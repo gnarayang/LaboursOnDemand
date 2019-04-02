@@ -285,24 +285,20 @@ public class Form2Activity extends AppCompatActivity {
                 dateTime.setError("Please enter time before submitting");
             }
         } else {
-           /* services.setServiceID(firebaseAuth.getUid() + "+" + String.valueOf(System.currentTimeMillis()));
-            services.setSkill(getIntent().getExtras().getString("skill"));
-            services.setDescription(problem_description);
-            services.setCustomerAmount(Long.valueOf(amonut_string));*/
+
             servicesFinal.setCustomerUID(firebaseAuth.getUid());
-            //servicesFinal.setCustomerUID("1");
             servicesFinal.setDescription(problem_description);
             servicesFinal.setNumOfLabourers(Long.valueOf(number_string));
             servicesFinal.setCustomerAmount(Long.valueOf(amonut_string));
-            //servicesFinal.setServiceId(firebaseAuth.getUid() + "+" + String.valueOf(System.currentTimeMillis()));
             servicesFinal.setServiceId(customer.getId() + "+" + String.valueOf(System.currentTimeMillis()));
             servicesFinal.setSkill(getIntent().getExtras().getString("skill"));
-            //servicesFinal.setDestination(customer.getDestination());
             servicesFinal.setDestinationLatitude(customer.getDestinationLatitude());
             servicesFinal.setDestinationLongitude(customer.getDestinationLongitude());
             servicesFinal.setStatus("incoming");
             servicesFinal.setTitle(title_string);
             servicesFinal.setStartTime(st);
+            servicesFinal.setApplyable(true);
+            servicesFinal.setPaid(false);
             sendToFirebase();
         }
     }
@@ -364,6 +360,11 @@ public class Form2Activity extends AppCompatActivity {
         // map.put("feedback","");
         map.put("skill", servicesFinal.getSkill());
         map.put("title",servicesFinal.getTitle());
+        map.put("destinationLongitude",customer.getDestinationLongitude());
+        map.put("destinationLatitude",customer.getDestinationLatitude());
+        map.put("startTime",st);
+        map.put("endTime",null);
+        map.put("numOfLabourers",servicesFinal.getNumOfLabourers());
         //map.put("images", pictures);
         //map.put("labourResponses", new HashMap<String, Long>());
 
@@ -433,6 +434,53 @@ public class Form2Activity extends AppCompatActivity {
                                                                             customer.getIncomingServices().add(servicesFinal);
                                                                             session.saveServices(servicesFinal);
                                                                             session.saveCustomer(customer);
+                                                                            firebaseFirestore.collection("labourer").whereArrayContains("skill",servicesFinal.getSkill())
+                                                                                    .get()
+                                                                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                                                                        @Override
+                                                                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                                                                            int i =0;
+                                                                                            for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                                                                                i++;
+                                                                                                String token = documentSnapshot.getString("token");
+                                                                                                Retrofit retrofit = new Retrofit.Builder()
+                                                                                                        .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                                                                        .addConverterFactory(GsonConverterFactory.create())
+                                                                                                        .build();
+
+                                                                                                Api api = retrofit.create(Api.class);
+                                                                                                String title = "A job is available";
+                                                                                                String body = "Job: "+servicesFinal.getTitle();
+                                                                                                Call<ResponseBody> call = api.sendNotification(token,title,body);
+                                                                                                if(i == queryDocumentSnapshots.size()){
+                                                                                                    onBackPressed();
+                                                                                                }
+                                                                                                call.enqueue(new Callback<ResponseBody>() {
+                                                                                                    @Override
+                                                                                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                                                                        try {
+                                                                                                            Toast.makeText(getApplicationContext(),response.body().string(),Toast.LENGTH_LONG).show();
+                                                                                                        } catch (IOException e) {
+                                                                                                            e.printStackTrace();
+                                                                                                        }
+                                                                                                    }
+
+                                                                                                    @Override
+                                                                                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                                        @Override
+                                                                                        public void onFailure(@NonNull Exception e) {
+                                                                                            Log.d(TAG,"Could not get toke!");
+                                                                                        }
+                                                                                    });
+
+
                                                                             firebaseFirestore.collection("labourer").whereArrayContains("skill",servicesFinal.getSkill())
                                                                                     .get()
                                                                                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

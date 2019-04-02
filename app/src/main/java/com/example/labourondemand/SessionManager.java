@@ -37,10 +37,6 @@ public class SessionManager {
     private static final String IS_LOGIN = "IsLoggedIn";
 
     // User name (make variable public to access from outside)
-    public static final String KEY_PASSWORD = "password";
-
-    // Email address (make variable public to access from outside)
-    public static final String KEY_EMAIL = "email";
 
     // Constructor
     public SessionManager(Context context){
@@ -66,13 +62,15 @@ public class SessionManager {
 
     public void saveLabourer(LabourerFinal labourerFinal){
 
-        String json = gson.toJson(labourerFinal); // myObject - instance of MyObject
-        //editor.putString(labourerFinal.(),json);
+        String json = gson.toJson(labourerFinal);
+        Log.d("jsonsaveLabourer",json+"!");
+        editor.putString(labourerFinal.getId(),json);
         editor.commit();
     }
 
     public LabourerFinal getLabourer(String labourerUID){
         String json = pref.getString(labourerUID, "");
+        Log.d("jsongetLabourer",json+"!");
         LabourerFinal labourerFinal = gson.fromJson(json, LabourerFinal.class);
         return labourerFinal;
     }
@@ -80,14 +78,14 @@ public class SessionManager {
     public void saveCustomer(CustomerFinal customerFinal){
 
         String json = gson.toJson(customerFinal); // myObject - instance of MyObject
-        Log.d("json",json+"!");
+        Log.d("jsonsaveCustomer",json+"!");
         editor.putString(customerFinal.getId(),json);
         editor.commit();
     }
 
     public CustomerFinal getCustomer(String customerUID){
         String json = pref.getString(customerUID, "");
-        Log.d("json",json+"!");
+        Log.d("jsongetCustomer",json+"!");
         CustomerFinal customerFinal = gson.fromJson(json, CustomerFinal.class);
         return customerFinal;
     }
@@ -95,7 +93,7 @@ public class SessionManager {
     /**
      * Create login session
      * */
-    public void createLoginSession(String password, String email){
+    /*public void createLoginSession(String password, String email){
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
 
@@ -107,6 +105,21 @@ public class SessionManager {
 
         // commit changes
         editor.commit();
+    }*/
+
+    public void putEmailAndPassword(String email, String password){
+
+
+        editor.putString("email",email);
+        editor.putString("password",password);
+        editor.commit();
+    }
+    public String getEmail(){
+        return  pref.getString("email","");
+    }
+
+    public String getPassword(){
+        return  pref.getString("password","");
     }
     /*
     *
@@ -138,8 +151,6 @@ public class SessionManager {
     }
 
     public Boolean isSetup(String s){
-
-
         String name = pref.getString(s,null);
         Log.d("name",name+"!");
         if(name == null){
@@ -232,7 +243,7 @@ public class SessionManager {
     /**
      * Get stored session data
      * */
-    public HashMap<String, String> getUserDetails(){
+   /* public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
         user.put(KEY_PASSWORD, pref.getString(KEY_PASSWORD, null));
@@ -242,7 +253,7 @@ public class SessionManager {
 
         // return user
         return user;
-    }
+    }*/
 
     /**
      * Clear session details

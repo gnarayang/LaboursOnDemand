@@ -3,12 +3,13 @@ package com.example.labourondemand;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class LabourerFinal extends User implements Serializable {
 
     private Services currentService;
     private Double averageRating;
-    private Boolean isBusy;
+    private boolean isBusy;
     private ArrayList<String> skill;
     private Long workExperience;
     private ArrayList<ServicesFinal> incomingServices, historyServices;
@@ -28,14 +29,14 @@ public class LabourerFinal extends User implements Serializable {
     }
 
     public LabourerFinal(String id, String name, String image, String dob, String city, String state, String addressLine1,
-                         String addressLine2, String addressLine3, Long phone, Long wallet, ArrayList<String> services) {
-        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services);
+                         String addressLine2, String addressLine3, Long phone, Long wallet, ArrayList<String> services, String email, String password) {
+        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services, email, password);
     }
 
     public LabourerFinal(String id, String name, String image, String dob, String city, String state, String addressLine1, String addressLine2,
                          String addressLine3, Long phone, Long wallet, ArrayList<String> services, Boolean isBusy, ArrayList<String> skill,
-                         Long workExperience) {
-        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services);
+                         Long workExperience , String email, String password) {
+        super(id, name, image, dob, city, state, addressLine1, addressLine2, addressLine3, phone, wallet, services, email, password);
         this.isBusy = isBusy;
         this.skill = skill;
         this.workExperience = workExperience;

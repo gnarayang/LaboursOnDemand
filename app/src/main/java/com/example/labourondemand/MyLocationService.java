@@ -1,3 +1,4 @@
+/*
 package com.example.labourondemand;
 
 import android.app.Service;
@@ -11,9 +12,11 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
+*/
 /**
  * Created by roberto on 9/29/16.
- */
+ *//*
+
 
 public class MyLocationService extends Service {
     private static final String TAG = "MyLocationService";
@@ -51,12 +54,14 @@ public class MyLocationService extends Service {
         }
     }
 
-    /*
+    */
+/*
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
             new LocationListener(LocationManager.NETWORK_PROVIDER)
     };
-    */
+    *//*
+
 
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.PASSIVE_PROVIDER)
@@ -94,7 +99,8 @@ public class MyLocationService extends Service {
             Log.d(TAG, "network provider does not exist, " + ex.getMessage());
         }
 
-        /*try {
+        */
+/*try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
                     LOCATION_INTERVAL,
@@ -105,7 +111,8 @@ public class MyLocationService extends Service {
             Log.i(TAG, "fail to request location update, ignore", ex);
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
-        }*/
+        }*//*
+
     }
 
     @Override
@@ -133,3 +140,4 @@ public class MyLocationService extends Service {
         }
     }
 }
+*/

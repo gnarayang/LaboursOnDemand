@@ -20,12 +20,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHolder> {
     private Context context;
-    private ArrayList<Services> servicesArrayList;
+    private ArrayList<ServicesFinal> servicesArrayList;
     private ArrayList<Labourer> labourers;
     private LabourerMainActivity labourerMainActivity;
     private CustomerMainActivity customerMainActivity;
     private Integer type;
-    private Services service;
+    private ServicesFinal service;
+    private Services services;
     private Customer customer;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -47,7 +48,7 @@ class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHol
     }
 
 
-    public DashboardAdapter(Context context, ArrayList<Services> servicesArrayList, Integer type) {
+    public DashboardAdapter(Context context, ArrayList<ServicesFinal> servicesArrayList, Integer type) {
         this.context = context;
         this.servicesArrayList = servicesArrayList;
         this.type = type;
@@ -57,7 +58,7 @@ class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHol
         this.context = context;
         this.type = type;
         this.labourers = labourers;
-        this.service = service;
+        this.services = service;
     }
 
     @NonNull
@@ -73,48 +74,51 @@ class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHol
     @Override
     public void onBindViewHolder(final DashboardAdapter.MyViewHolder holder, final int position) {
 
-        if(type == 0) {
 
-            holder.accept.setText("Next");
-            final Services service = servicesArrayList.get(position);
-            holder.name.setText(service.getCustomer().getName());
-            holder.landmark.setText("234");
-            Glide.with(context).load(service.getCustomer().getImage()).into(holder.photo);
-            holder.constraintLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("dashboard labour", service.getServiceID()+"!");
-                    Intent intent = new Intent(context, DetailServiceActivity.class);
-                    intent.putExtra("service", service);
-                    context.startActivity(intent);
-                }
-            });
 
-        }else{
-            final Labourer labourer = labourers.get(position);
-            Glide.with(context).load(labourer.getImage()).into(holder.photo);
-            holder.name.setText(labourer.getName());
-            holder.landmark.setText( String.valueOf(labourer.getCurrentServicePrice()));
-            holder.accept.setText("Accept");
-            if(labourer.getAverageRating() == null){
-                holder.tags.setText("No Rating");
-            }else {
-                holder.tags.setText(String.valueOf(labourer.getAverageRating()));
+
+
+        holder.accept.setText("Accepted");
+        final ServicesFinal service = servicesArrayList.get(position);
+        holder.name.setText(service.getCustomer().getName().toString());
+        holder.landmark.setText("234");
+        Glide.with(context).load(service.getCustomer().getImage()).into(holder.photo);
+        service.getRating();
+        holder.tags.setText("1");
+//            holder.constraintLayout.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Log.d("dashboard labour", service.getServiceId()+"!");
+//                    Intent intent = new Intent(context, DetailServiceActivity.class);
+//                    intent.putExtra("service", service);
+//                    context.startActivity(intent);
+//                }
+//            });
+
+
+//            final Labourer labourer = labourers.get(position);
+//            Glide.with(context).load(labourer.getImage()).into(holder.photo);
+//            holder.name.setText(labourer.getName());
+//            System.out.println("--------------------------------------------------------------------------------------------------------------------------"+labourer.getName());
+//            holder.landmark.setText( String.valueOf(labourer.getCurrentServicePrice()));
+//            holder.accept.setText("Accept");
+//            if(labourer.getAverageRating() == null){
+//                holder.tags.setText("No Rating");
+//            }else {
+//                holder.tags.setText(String.valueOf(labourer.getAverageRating()));
+//            }
+        holder.accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // go to Review Activity
+                Intent intent = new Intent(context,DetailAcceptedServiceActivity.class);
+                intent.putExtra("service",service);
+                Log.d("customer dashboard", service.getCustomer()+"!");
+                context.startActivity(intent);
             }
-            holder.accept.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // go to Review Activity
-                    Intent intent = new Intent(context,ReviewActivity.class);
-                    intent.putExtra("service",service);
-                    intent.putExtra("customer",customer);
-                    intent.putExtra("labourer",labourer);
-                    Log.d("customer dashboard", service.getCustomer()+"!");
-                    context.startActivity(intent);
-                }
-            });
-        }
+        });
     }
+
 
     @Override
     public int getItemCount() {
@@ -125,7 +129,7 @@ class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHol
         }
     }
 
-    public void added(Services c){
+    public void added(ServicesFinal c){
         Log.d("added @ adapter", servicesArrayList.size()+"s");
         servicesArrayList.add(c);
         notifyItemInserted(servicesArrayList.indexOf(c));
@@ -138,7 +142,7 @@ class   DashboardAdapter extends RecyclerView.Adapter<DashboardAdapter.MyViewHol
     }
 
     public void setServiceAndCustomer(Services service, Customer customer){
-        this.service = service;
+        this.services = service;
         this.customer = customer;
     }
 }

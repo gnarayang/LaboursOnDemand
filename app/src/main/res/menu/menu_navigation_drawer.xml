@@ -23,7 +23,7 @@
         <item
             android:id="@+id/nav_wallet"
             android:icon="@drawable/ic_account_balance_wallet_black_24dp"
-            android:title="Profile" />
+            android:title="Wallet" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"

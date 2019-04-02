@@ -13,14 +13,21 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class CustomerJobsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        CustomerJobsFragment.OnFragmentInteractionListener{
+        CustomerJobsFragment.OnFragmentInteractionListener {
 
     protected DrawerLayout drawerLayout;
     protected NavigationView navigationView;
@@ -32,6 +39,8 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
     private CustomerFinal customer;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
+    private ArrayList<ServicesFinal> currentServices;
+    private SessionManager sessionManager;
 
 
     @SuppressLint("ResourceType")
@@ -45,6 +54,7 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         navigationView = findViewById(R.id.customer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
 
+        sessionManager = new SessionManager(getApplicationContext());
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         setSupportActionBar(toolbar);
@@ -56,26 +66,63 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(2).setChecked(true);
 
-
-        Bundle bundle = new Bundle();
         customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
-        bundle.putSerializable("customer", customer);
+        Log.d("customer Jobs", customer.toString() + "!");
 
         viewPager = findViewById(R.id.customer_jobs_vp);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-
-        //there should be multiple jobs
-        CustomerJobsFragment customerJobsFragment1 = new CustomerJobsFragment();
-        CustomerJobsFragment customerJobsFragment2 = new CustomerJobsFragment();
-
-        customerJobsFragment1.setArguments(bundle);
-        customerJobsFragment1.setArguments(bundle);
-
-        //should be inside a for loop through all fragments
-        viewPagerAdapter.addFragment(customerJobsFragment1, "Job1");
-        viewPagerAdapter.addFragment(customerJobsFragment2, "Job2");
-
         viewPager.setAdapter(viewPagerAdapter);
+        currentServices = customer.getIncomingServices();
+
+        if(currentServices == null)
+        {
+            customer.setIncomingServices(new ArrayList<>());
+            currentServices = customer.getIncomingServices();
+
+            firebaseFirestore.collection("services").whereEqualTo("customerUID",customer.getId())
+                    .whereEqualTo("status","incoming")
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                ServicesFinal servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
+                                servicesFinal.setServiceId(documentSnapshot.getId());
+                                servicesFinal.setApplyable(documentSnapshot.getBoolean("isApplyable"));
+                                servicesFinal.setPaid(documentSnapshot.getBoolean("isPaid"));
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("customer", customer);
+                                bundle.putSerializable("service", servicesFinal);
+                                CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
+                                customerJobsFragment.setArguments(bundle);
+                                viewPagerAdapter.addFragment(customerJobsFragment, "Job");
+                                viewPagerAdapter.notifyDataSetChanged();
+
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                        }
+                    });
+
+
+        }else{
+            for (int i = 0; i < currentServices.size(); i++) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("customer", customer);
+                bundle.putSerializable("service", currentServices.get(i));
+                CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
+                customerJobsFragment.setArguments(bundle);
+                viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
+                viewPagerAdapter.notifyDataSetChanged();
+            }
+        }
+        //should be inside a for loop through all fragments
+
+        //viewPager.setAdapter(viewPagerAdapter);
 
     }
 
@@ -86,14 +133,14 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.bottom_navigation_home:
-                    Intent intent = new Intent(CustomerJobsActivity.this,CustomerHomeActivity.class);
-                    intent.putExtra("customer",customer);
+                    Intent intent = new Intent(CustomerJobsActivity.this, CustomerHomeActivity.class);
+                    intent.putExtra("customer", customer);
                     startActivity(intent);
                     finish();
                     return true;
                 case R.id.bottom_navigation_history:
-                    Intent intent1 = new Intent(CustomerJobsActivity.this,CustomerHistoryActivity.class);
-                    intent1.putExtra("customer",customer);
+                    Intent intent1 = new Intent(CustomerJobsActivity.this, CustomerHistoryActivity.class);
+                    intent1.putExtra("customer", customer);
                     startActivity(intent1);
                     finish();
                     return true;
@@ -120,36 +167,37 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
-        } else if (id == R.id.nav_history) {
-            //Toast.makeText(this,"History yet to be Developed",)
-            Intent intent = new Intent(this, PreviousActivity.class);
+            Intent intent = new Intent(CustomerJobsActivity.this,CustomerHomeActivity.class);
+            intent.putExtra("customer",customer);
             startActivity(intent);
+            finish();
+        } else if (id == R.id.nav_history) {
+            Intent intent = new Intent(CustomerJobsActivity.this,CustomerHistoryActivity.class);
+            intent.putExtra("customer",customer);
+            startActivity(intent);
+            finish();
+        }else if (id == R.id.nav_jobs) {
+
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            /*Bundle bundle = new Bundle();
-            bundle.putParcelable("labourer",labourer);*//*
-            intent.putExtra("user", labourer);
-            intent.putExtra("type","labourer");
-            Log.d(tag, "labourer : " + labourer.getAddressLine1());*/
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_manage) {
-            //Intent settings = new Intent(LabourerMainActivity.this,SettingsActivity.class);
-            //startActivity(settings);
-
-        } else if (id == R.id.nav_share) {
-
+        }  else if (id == R.id.nav_wallet) {
+            Intent intent = new Intent(this, WalletActivity.class);
+            intent.putExtra("customer", customer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + customer.getAddressLine1());
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-
             firebaseAuth.signOut();
+            sessionManager.logoutUser();
             Intent intent = new Intent(CustomerJobsActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_wallet) {
-            /*Intent intent = new Intent(CustomerHistoryActivity.this, NAME.class);
-            startActivity(intent);*/
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

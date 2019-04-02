@@ -1,80 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <LinearLayout
-        android:id="@+id/profile_ll_personal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_normal">
-
-        <TextView
-            android:id="@+id/service_address_line1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_larger"
-            android:text="Address Line 1"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_small" />
-
-        <TextView
-            android:id="@+id/service_address_tv_line1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal" />
-
-        <TextView
-            android:id="@+id/service_address_tv_line2_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_larger"
-            android:text="Address Line 2"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_small" />
-
-        <TextView
-            android:id="@+id/service_address_tv_line2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal" />
-
-        <TextView
-            android:id="@+id/service_address_landmark_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_larger"
-            android:text="Landmark"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_small" />
-
-        <TextView
-            android:id="@+id/service_address_tv_landmark"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal" />
-
-        <TextView
-            android:id="@+id/service_address_city_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_larger"
-            android:text="City"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_size_small" />
-
-        <TextView
-            android:id="@+id/service_address_tv_city"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal"
-            android:layout_marginBottom="@dimen/margin_large"/>
-
-
-    </LinearLayout>
-
-</ScrollView>
+    android:layout_height="match_parent"
+    tools:context="com.example.labourondemand.DetailAcceptedServiceActivity">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map"
+    android:name="com.google.android.gms.maps.SupportMapFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapsActivity2" />
+</FrameLayout>

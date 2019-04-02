@@ -130,33 +130,16 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.bottom_navigation_home:
-
+                    Intent intent = new Intent(LabourerHistoryActivity.this, LabourerHomeActivity.class);
+                    intent.putExtra("labourer",labourer);
+                    startActivity(intent);
                     return true;
                 case R.id.bottom_navigation_history:
-//                    recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("services");
-//                    Query query = databaseReference;
-//                    query.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            if (dataSnapshot.exists()) {
-//                                List<Service> services = new ArrayList<>();
-//                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                                    Service service = snapshot.getValue(Service.class);
-//                                    services.add(service);
-//                                }
-//                                recyclerView.setAdapter(new LabourerHistoryRVAdapter(context,services));
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {
-//
-//                        }
-//                    });
                     return true;
                 case R.id.bottom_navigation_jobs:
-
+                    Intent intent1 = new Intent(LabourerHistoryActivity.this, LabourerMainActivity.class);
+                    intent1.putExtra("labourer",labourer);
+                    startActivity(intent1);
                     return true;
             }
             return false;
@@ -179,39 +162,38 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
+            Intent intent = new Intent(LabourerHistoryActivity.this,LabourerHomeActivity.class);
+            intent.putExtra("labourer",labourer);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.nav_history) {
-            //Toast.makeText(this,"History yet to be Developed",)
-//            Intent intent = new Intent(this, PreviousActivity.class);
-//            startActivity(intent);
 
-        } else if (id == R.id.nav_jobs) {
-
+        }else if (id == R.id.nav_jobs) {
+            Intent intent = new Intent(LabourerHistoryActivity.this,LabourerMainActivity.class);
+            intent.putExtra("labourer",labourer);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            /*Bundle bundle = new Bundle();
-            bundle.putParcelable("labourer",labourer);*//*
-            intent.putExtra("user", labourer);
-            intent.putExtra("type","labourer");
-            Log.d(tag, "labourer : " + labourer.getAddressLine1());*/
+            intent.putExtra("labourer",labourer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_manage) {
-            //Intent settings = new Intent(LabourerMainActivity.this,SettingsActivity.class);
-            //startActivity(settings);
-
-        } else if (id == R.id.nav_share) {
-
+        }  else if (id == R.id.nav_wallet) {
+            Intent intent = new Intent(this, WalletActivity.class);
+            Log.d("cbuidbcidbysi",labourer.toString());
+            intent.putExtra("labourer",labourer);
+            intent.putExtra("type","customer");
+            Log.d(tag, "labourer : " + labourer.getAddressLine1());
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-
             firebaseAuth.signOut();
+            //session.logoutUser();
             Intent intent = new Intent(LabourerHistoryActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_wallet) {
-            /*Intent intent = new Intent(CustomerHistoryActivity.this, NAME.class);
-            startActivity(intent);*/
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

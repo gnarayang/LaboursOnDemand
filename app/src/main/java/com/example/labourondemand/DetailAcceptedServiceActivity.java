@@ -13,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
@@ -30,14 +29,14 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DetailServiceActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ServiceAmountFragment.OnFragmentInteractionListener,
+public class DetailAcceptedServiceActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, AppliedServiceAmountFragment.OnFragmentInteractionListener,
         ServiceAddressFragment.OnFragmentInteractionListener,ServiceDescriptionFragment.OnFragmentInteractionListener {
 
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigationView;
-    private ServicesFinal services = new ServicesFinal();
+    private ServicesFinal services ;
     private EditText description, addressLine1, addressLine2, landmark, city;
     private Button submitButton;
     private ViewPager viewPager;
@@ -57,7 +56,7 @@ public class DetailServiceActivity extends AppCompatActivity
     private Button submit;
     private String TAG = ProfileActivity.class.getName();
     private Boolean isLabourer = false, isEditting;
-    private LabourerFinal labourer = new LabourerFinal();
+    private Labourer labourer = new Labourer();
     private TextView name;
     private CircleImageView photo;
     private ProgressBar progressBar;
@@ -83,33 +82,30 @@ public class DetailServiceActivity extends AppCompatActivity
         navigationView = findViewById(R.id.detail_service_nav);
         navigationView.setNavigationItemSelectedListener(this);
 
-        services = (ServicesFinal) getIntent().getSerializableExtra("services");
-        labourer = (LabourerFinal) getIntent().getSerializableExtra("labourer");
+        services = (ServicesFinal) getIntent().getExtras().get("service");
         viewPagerImages = findViewById(R.id.detail_service_vp_images);
         viewPagerData = findViewById(R.id.detail_service_vp_data);
         tabs = findViewById(R.id.detail_service_tl);
         tabsImages = findViewById(R.id.detail_service_tl_images);
         tabsImages.setupWithViewPager(viewPagerImages,true);
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("services", services);
-        bundle.putSerializable("labourer",labourer);
-        Log.d("service detail",services.toString());
         slide = new Slide(this, services.getImages());
         viewPagerImages.setAdapter(slide);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
 
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("services", services);
 
         ServiceDescriptionFragment serviceDescriptionFragment = new ServiceDescriptionFragment();
-        //ServiceAddressFragment serviceAddressFragment = new ServiceAddressFragment();
-        ServiceAmountFragment serviceAmountFragment = new ServiceAmountFragment();
+        ServiceAddressFragment serviceAddressFragment = new ServiceAddressFragment();
+        AppliedServiceAmountFragment serviceAmountFragment = new AppliedServiceAmountFragment();
 
-        //serviceAddressFragment.setArguments(bundle);
+        serviceAddressFragment.setArguments(bundle);
         serviceAmountFragment.setArguments(bundle);
         serviceDescriptionFragment.setArguments(bundle);
 
         viewPagerAdapter.addFragment(serviceDescriptionFragment,"Description");
-        //viewPagerAdapter.addFragment(serviceAddressFragment,"Location");
+        viewPagerAdapter.addFragment(serviceAddressFragment,"Location");
         viewPagerAdapter.addFragment(serviceAmountFragment,"Amount");
 
         viewPagerData.setAdapter(viewPagerAdapter);
@@ -176,7 +172,7 @@ public class DetailServiceActivity extends AppCompatActivity
         }else if(id == R.id.nav_logout){
 
             firebaseAuth.signOut();
-            Intent intent = new Intent(DetailServiceActivity.this,LoginActivity.class);
+            Intent intent = new Intent(DetailAcceptedServiceActivity.this,LoginActivity.class);
             startActivity(intent);
             finish();
         }

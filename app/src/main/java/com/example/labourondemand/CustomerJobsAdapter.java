@@ -1,7 +1,6 @@
 package com.example.labourondemand;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -39,23 +38,30 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
     Context context;
     private ArrayList<LabourerFinal> labourers;
     private ServicesFinal service;
+    private CustomerFinal customerFinal;
     private ArrayList<String> selectedLabourersUID;
-    private FirebaseFirestore db;
+    private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
 
-    public CustomerJobsAdapter(Context context, ServicesFinal service){
+    public CustomerJobsAdapter(Context context, ServicesFinal service, CustomerFinal customerFinal) {
         this.context = context;
         this.service = service;
         this.labourers = service.getLabourers();
-        if(service.getSelectedLabourerUID() == null){
+        if (service.getSelectedLabourerUID() == null) {
             selectedLabourersUID = new ArrayList<>();
-        }else {
+        } else {
             selectedLabourersUID = service.getSelectedLabourerUID();
         }
+        this.customerFinal = customerFinal;
+        this.firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    public ServicesFinal getService() {
+        return service;
     }
 
     public void setService(ServicesFinal service) {
-
+        Log.d("set Service in ada", service.toString());
         this.service = service;
     }
 
@@ -93,125 +99,141 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
         final LabourerFinal labourer = labourers.get(position);
         Glide.with(context).load(labourer.getImage()).into(holder.photo);
         holder.name.setText(labourer.getName());
-        holder.price.setText( String.valueOf(service.getLabourerResponses().get(labourer.getId())));
+        if(service.getLabourerResponses() != null){
+            holder.price.setText(String.valueOf(service.getLabourerResponses().get(labourer.getId())));
+        }
+
         holder.accept.setText("Accept");
-        if(labourer.getAverageRating() == null){
+        if (labourer.getAverageRating() == null) {
             holder.rating.setText("No Rating");
-        }else {
+        } else {
             holder.rating.setText(String.valueOf(labourer.getAverageRating()));
         }
-        holder.accept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedLabourersUID = service.getSelectedLabourerUID();
-                if(selectedLabourersUID.size() < service.getNumOfLabourers()) {
 
-                    db.collection("labourer").document(labourer.getId())
-                    .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            String token = documentSnapshot.getString("token");
-                            Retrofit retrofit = new Retrofit.Builder()
-                                    .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
-                                    .addConverterFactory(GsonConverterFactory.create())
-                                    .build();
+        if (service.getSelectedLabourerUID()!= null &&service.getSelectedLabourerUID().contains(labourer.getId())) {
+            holder.accept.setText("Accepted");
+        } else {
+            holder.accept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (service.getSelectedLabourerUID() == null) {
+                        service.setSelectedLabourerUID(new ArrayList<>());
+                    }
+                    selectedLabourersUID = service.getSelectedLabourerUID();
+                    if (selectedLabourersUID.size() < service.getNumOfLabourers()) {
 
-                            Api api = retrofit.create(Api.class);
-                            String title = "JOB ACCEPTED";
-                            String body = "job accepted";
-                             Call<ResponseBody> call = api.sendNotification(token,title,body);
-
-                             call.enqueue(new Callback<ResponseBody>() {
-                                 @Override
-                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                     try {
-                                         Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
-                                     } catch (IOException e) {
-                                         e.printStackTrace();
-                                     }
-                                 }
-
-                                 @Override
-                                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                                 }
-                             });
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
-
-
-
-
-                    service.getSelectedLabourerUID().add(labourer.getId());
-
-                    //selectedLabourersUID.add(labourer.getId());
-                    //labourer.setCurrentServiceId(service.getServiceId());
-
-                    db.collection("service").document(service.getServiceId())
-                            .update("selectedLabourerUID", FieldValue.arrayUnion(service.getServiceId()))
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: Service successfully updated.");
-
-                                    db.collection("labourer").document(labourer.getId())
-                                            .update("currentServiceId",service.getServiceId())
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "onSuccess: Labourer successfully written.");
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w(TAG, "onFailure: Error writing labourer back.", e);
-                                                }
-                                            });
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.w(TAG, "onFailure: Service not updated.", e);
-                                }
-                            });
-
-
-
-                    //logic for labourer (goes in a batch)
-                    if(selectedLabourersUID.size() == service.getNumOfLabourers()) {
-                        //service.setSelectedLabourerUID(selectedLabourersUID);
-                        service.setApplyable(false);
-
-                        db.collection("service").document(service.getServiceId())
-                                .update("isApplyable",false )
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        firebaseFirestore.collection("labourer").document(labourer.getId())
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                     @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d(TAG, "onSuccess: Service successfully updated.");
+                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            /*LabourerFinal labourerFinal = documentSnapshot.toObject(LabourerFinal.class);
+                            service.getSelectedLabourers().add(labourerFinal)*/
+
+                                        if (service.getSelectedLabourers() == null) {
+                                            service.setSelectedLabourers(new ArrayList<LabourerFinal>());
+                                        }
+                                        service.getSelectedLabourers().add(labourer);
+
+                                        String token = documentSnapshot.getString("token");
+                                        Retrofit retrofit = new Retrofit.Builder()
+                                                .baseUrl("https://labourondemand-8e636.firebaseapp.com/api/")
+                                                .addConverterFactory(GsonConverterFactory.create())
+                                                .build();
+
+                                        Api api = retrofit.create(Api.class);
+                                        String title = customerFinal.getName() + " Accepted Your Request";
+                                        String body = "Job : " + service.getTitle();
+                                        Call<ResponseBody> call = api.sendNotification(token, title, body);
+
+                                        call.enqueue(new Callback<ResponseBody>() {
+                                            @Override
+                                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                                try {
+                                                    Toast.makeText(context, response.body().string(), Toast.LENGTH_LONG).show();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                            }
+                                        });
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.w(TAG, "onFailure: Service not updated.", e);
+
                                     }
                                 });
+
+
+                        Log.d("jobs adapter", "befpre u-pdating");
+
+
+                        firebaseFirestore.collection("labourer").document(labourer.getId())
+                                .update("currentServiceId", service.getServiceId())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        service.getSelectedLabourerUID().add(labourer.getId());
+                                        Log.d(TAG, "onSuccess: Labourer successfully written.");
+                                        if (selectedLabourersUID.size() == service.getNumOfLabourers()) {
+                                            service.setApplyable(false);
+                                            firebaseFirestore.collection("services").document(service.getServiceId())
+                                                    .update("isApplyable", false,
+                                                            "selectedLabourerUID", FieldValue.arrayUnion(labourer.getId()))
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "onSuccess: Service successfully updated.");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "onFailure: Service not updated.", e);
+                                                        }
+                                                    });
+                                        } else {
+                                            firebaseFirestore.collection("services").document(service.getServiceId())
+                                                    .update("selectedLabourerUID", FieldValue.arrayUnion(labourer.getId()))
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "onSuccess: Service successfully updated.");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "onFailure: Service not updated.", e);
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.w(TAG, "onFailure: Error writing labourer back.", e);
+
+                                    }
+
+                                });
+
+
+                        //logic for labourer (goes in a batch)
+
+                    } else if (selectedLabourersUID.size() == service.getNumOfLabourers()) {
+                        Toast.makeText(context, "You have already selected required number of labourers.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                else if(selectedLabourersUID.size() == service.getNumOfLabourers()) {
-                    Toast.makeText(context, "You have already selected required number of labourers.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -219,14 +241,18 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
         return labourers.size();
     }
 
+    public void setLabourers(ArrayList<LabourerFinal> labourers) {
+        this.labourers = labourers;
+        notifyDataSetChanged();
+    }
 
-    public void clear(){
+    public void clear() {
         labourers.clear();
         notifyDataSetChanged();
     }
 
-    public void addLabourer(LabourerFinal labourer){
-        Log.d("addedFromCustomer ", labourers.size()+"s");
+    public void addLabourer(LabourerFinal labourer) {
+        Log.d("addedFromCustomer ", labourers.size() + "s");
         labourers.add(labourer);
         notifyItemInserted(labourers.indexOf(labourer));
     }
@@ -242,7 +268,7 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
         notifyDataSetChanged(); //to trigger onBindViewHolder
     }
 
-    public Boolean isDone(){
-        return !service.getApplyable();
+    public Boolean isDone() {
+        return !service.isApplyable();
     }
 }

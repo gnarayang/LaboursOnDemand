@@ -19,10 +19,17 @@ public class ServicesFinal implements Serializable {
     private ArrayList<String> images, selectedLabourerUID;
     private Double destinationLatitude, destinationLongitude;
     private CustomerFinal customer;
-    private ArrayList<LabourerFinal> labourers;
-    private GeoPoint destination;
+    private ArrayList<LabourerFinal> labourers, selectedLabourers;
     private String startTime, endTime;
-    private Boolean isPaid, isApplyable;
+    private boolean isPaid, isApplyable;
+
+    public ArrayList<LabourerFinal> getSelectedLabourers() {
+        return selectedLabourers;
+    }
+
+    public void setSelectedLabourers(ArrayList<LabourerFinal> selectedLabourers) {
+        this.selectedLabourers = selectedLabourers;
+    }
 
     public ServicesFinal() {
     }
@@ -43,20 +50,20 @@ public class ServicesFinal implements Serializable {
         this.destinationLongitude = destinationLongitude;
     }
 
-    public Boolean getApplyable() {
-        return isApplyable;
-    }
-
-    public void setApplyable(Boolean applyable) {
-        isApplyable = applyable;
-    }
-
-    public Boolean getPaid() {
+    public boolean isPaid() {
         return isPaid;
     }
 
-    public void setPaid(Boolean paid) {
+    public void setPaid(boolean paid) {
         isPaid = paid;
+    }
+
+    public boolean isApplyable() {
+        return isApplyable;
+    }
+
+    public void setApplyable(boolean applyable) {
+        isApplyable = applyable;
     }
 
     public String getTitle() {
@@ -179,13 +186,13 @@ public class ServicesFinal implements Serializable {
         this.labourers = labourers;
     }
 
-    public GeoPoint getDestination() {
+   /* public GeoPoint getDestination() {
         return destination;
     }
 
     public void setDestination(GeoPoint destination) {
         this.destination = destination;
-    }
+    }*/
 
     public String getStartTime() {
         return startTime;
@@ -223,7 +230,6 @@ public class ServicesFinal implements Serializable {
                 ", destinationLongitude=" + destinationLongitude +
                 ", customer=" + customer +
                 ", labourers=" + labourers +
-                ", destination=" + destination +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
                 ", isPaid=" + isPaid +

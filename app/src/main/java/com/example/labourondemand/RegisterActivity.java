@@ -41,6 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private String selectedId;
     private String TAG = RegisterActivity.class.getName();
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+
+        sessionManager = new SessionManager(getApplicationContext());
 
         reg_email_field = findViewById(R.id.register_et_email);
         reg_pass_field =  findViewById(R.id.register_et_password);
@@ -100,6 +103,8 @@ public class RegisterActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if(task.isSuccessful()){
+                                                        sessionManager.putEmailAndPassword(email,pass);
+                                                        Log.d("sessionregi",sessionManager.getEmail()+"!");
                                                         Intent setupIntent = new Intent(RegisterActivity.this, SetupActivity.class);
                                                         setupIntent.putExtra("type",selectedId);
                                                         startActivity(setupIntent);

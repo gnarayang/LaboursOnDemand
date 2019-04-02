@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
 
                             if(task.isSuccessful()){
-                                session.createLoginSession(loginPass, loginEmail);
+                                session.putEmailAndPassword(loginEmail,loginPass);
                                 sendToCheck();
 
                             } else {

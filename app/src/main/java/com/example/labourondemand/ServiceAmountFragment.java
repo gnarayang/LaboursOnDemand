@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +56,6 @@ public class ServiceAmountFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private FirebaseFirestore firebaseFirestore;
     private OnFragmentInteractionListener mListener;
 
     public ServiceAmountFragment() {
@@ -88,6 +88,7 @@ public class ServiceAmountFragment extends Fragment {
         if (bundle != null) {
             services = (ServicesFinal)bundle.getSerializable("services");
             labourerFinal = (LabourerFinal)bundle.getSerializable("labourer");
+
         }
     }
     private LabourerFinal labourerFinal;
@@ -95,8 +96,9 @@ public class ServiceAmountFragment extends Fragment {
     private TextView customerAmount;
     private TextInputEditText labourerAmount;
     private Button submit;
+    private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private Context context;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,18 +111,28 @@ public class ServiceAmountFragment extends Fragment {
         submit = view.findViewById(R.id.service_amount_btn_submit);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
-        context = view.getContext();
+        progressBar = view.findViewById(R.id.service_amount_pb);
 
-//        customerAmount.setText(String.valueOf(services.getCustomerAmount()));
+
+        // Dummy comment
+      //  customerAmount.setText(String.valueOf(services.getCustomerAmount()));
+
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
 
                 if(labourerAmount.getText().toString() != null) {
-
+                    progressBar.setVisibility(View.VISIBLE);
                     HashMap<String, HashMap<String, Long>> map = new HashMap<>();
                     HashMap<String, Long> m = new HashMap<>();
+
+                    //System.out.println(services.toString());
+                    Log.d("amount fragment",services.toString());
+                    m.put(firebaseAuth.getUid(), Long.valueOf(labourerAmount.getText().toString()));
+                    services.setLabourerResponses(m);
+//                    //TODO: updating labourResponse ;
+
 
                     //System.out.println(services.toString());
                     Log.d("amount fragment",services.toString());
@@ -130,13 +142,13 @@ public class ServiceAmountFragment extends Fragment {
                     map.put("labourerResponses", m);
 
                     final String sid = services.getServiceId();
-//                    //TODO:services.setLabourerResponses(m);
-                    Log.d("tag",sid+"!"+m.toString());
 
-                    //get labour
+                    //TODO:services.setLabourerResponses(m);
+                    Log.d("labourerResponse",sid+"!"+m.toString());
 
-                    Log.d("first service",labourerFinal.getServices().get(0));
-                   firebaseFirestore.collection("labourer").document(firebaseAuth.getUid()).update("services", FieldValue.arrayUnion(sid));
+          //          Log.d("first service",labourerFinal.getServices().get(0));
+                    firebaseFirestore.collection("labourer").document(firebaseAuth.getUid()).update("services", FieldValue.arrayUnion(sid));
+
 
                     firebaseFirestore.collection("services").document(sid).set(map,SetOptions.merge())
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -145,23 +157,6 @@ public class ServiceAmountFragment extends Fragment {
                                     HashMap<String, String> lab = new HashMap<>();
                                     lab.put("currentService", sid);
 
-                                    /*firebaseFirestore.collection("labourer").document(firebaseAuth.getUid())
-                                            .set(lab, SetOptions.merge())
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Intent intent = new Intent(view.getContext(), LabourerMainActivity.class);
-                                                    intent.putExtra("currentService", sid);
-                                                    Toast.makeText(v.getContext(),"Update",Toast.LENGTH_LONG).show();
-                                                    //startActivity(intent);
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d("tag",e.toString());
-                                                }
-                                            });*/
                                     firebaseFirestore.collection("customer").document(services.getCustomerUID())
                                             .get()
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -178,11 +173,15 @@ public class ServiceAmountFragment extends Fragment {
                                                     String body = "A labourer applied for your job";
                                                     Call<ResponseBody> call = api.sendNotification(token,title,body);
 
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(view.getContext(),"Applied for the Service",Toast.LENGTH_LONG).show();
+                                                    getActivity().onBackPressed();
+
                                                     call.enqueue(new Callback<ResponseBody>() {
                                                         @Override
                                                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                                             try {
-                                                                Toast.makeText(context,response.body().string(),Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(view.getContext(),response.body().string(),Toast.LENGTH_LONG).show();
                                                             } catch (IOException e) {
                                                                 e.printStackTrace();
                                                             }
@@ -203,6 +202,24 @@ public class ServiceAmountFragment extends Fragment {
                                             });
 
 
+
+                                    /*firebaseFirestore.collection("labourer").document(firebaseAuth.getUid())
+                                            .set(lab, SetOptions.merge())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    Intent intent = new Intent(view.getContext(), LabourerMainActivity.class);
+                                                    intent.putExtra("currentService", sid);
+                                                    Toast.makeText(v.getContext(),"Update",Toast.LENGTH_LONG).show();
+                                                    //startActivity(intent);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("tag",e.toString());
+                                                }
+                                            });*/
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                         @Override

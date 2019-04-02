@@ -3,6 +3,7 @@ package com.example.labourondemand;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +26,8 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
 
         public MyViewHolder(View view) {
             super(view);
-            name = view.findViewById(R.id.item_service_tv_title);
-            photo = view.findViewById(R.id.item_service_civ_photo);
+            name = view.findViewById(R.id.item_review_labourer_tv);
+            photo = view.findViewById(R.id.item_review_labourer_civ);
         }
     }
 
@@ -41,7 +42,7 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
         LayoutInflater inflater = LayoutInflater.from(context);
-        view = inflater.inflate(R.layout.item_labourer, parent, false);
+        view = inflater.inflate(R.layout.item_review_labourer, parent, false);
         MyViewHolder myViewHolder = new MyViewHolder(view);
         return myViewHolder;
     }
@@ -49,7 +50,7 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
     @Override
     public void onBindViewHolder(final LabourerAdapter.MyViewHolder holder, final int position) {
 
-        LabourerFinal labourer = servicesFinals.getLabourers().get(position);
+        LabourerFinal labourer = servicesFinals.getSelectedLabourers().get(position);
         holder.name.setText(labourer.getName());
 
         Glide.with(context).load(labourer.getImage()).into(holder.photo);
@@ -57,7 +58,21 @@ public class LabourerAdapter extends RecyclerView.Adapter<LabourerAdapter.MyView
 
     @Override
     public int getItemCount() {
-        return this.servicesFinals.getLabourers().size();
+        if(servicesFinals.getSelectedLabourers() == null)
+        {
+            servicesFinals.setSelectedLabourers(new ArrayList<>());
+        }
+        return this.servicesFinals.getSelectedLabourers().size();
+    }
+
+    public void added(LabourerFinal c){
+        Log.d("added @ adapter", servicesFinals.getSelectedLabourers().size()+"s");
+        servicesFinals.getSelectedLabourers().add(c);
+        notifyItemInserted(servicesFinals.getSelectedLabourers().indexOf(c));
+    }
+
+    public ServicesFinal getService(){
+        return servicesFinals;
     }
 
   /*  public void added(Services c){

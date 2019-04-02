@@ -61,11 +61,11 @@ public class WorkDetailsFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            labourer = bundle.getParcelable("labourer");
+            labourer = (LabourerFinal) bundle.getSerializable("labourer");
         }
     }
 
-    private Labourer labourer = new Labourer();
+    private LabourerFinal labourer = new LabourerFinal();
     private EditText skill;
     private RatingBar ratingBar;
 
@@ -73,17 +73,17 @@ public class WorkDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       View view = inflater.inflate(R.layout.fragment_work_details, container, false);
+        View view = inflater.inflate(R.layout.fragment_work_details, container, false);
 
-       skill = view.findViewById(R.id.work_et_skill);
-       ratingBar = view.findViewById(R.id.work_rb);
+        skill = view.findViewById(R.id.work_et_skill);
+        ratingBar = view.findViewById(R.id.work_rb);
 
-       skill.setText(labourer.getSkill().toString());
+        skill.setText(labourer.getSkill().toString());
 
 
-       //ratingBar.setRating(Float.parseFloat(String.valueOf(labourer.getAverageRating())));
+        //ratingBar.setRating(Float.parseFloat(String.valueOf(labourer.getAverageRating())));
 
-       return view;
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

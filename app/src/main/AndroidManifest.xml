@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.labourondemand">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -25,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity android:name=".ThankYouActivity"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -39,10 +38,12 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".MapsActivity2" />
+        <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
-
-        <service
+            android:label="@string/title_activity_maps" />
+        <!--
+ <service
             android:name=".notifications.MyService"
             android:enabled="true"
             android:exported="true">
@@ -50,6 +51,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        -->
         <!--
 <service android:name=".java.MyFirebaseMessagingService">
             <intent-filter>
@@ -73,7 +75,7 @@
         -->
         <activity android:name=".LabourerJobsActivity" />
         <activity android:name=".LabourerHistoryActivity" />
-        <activity android:name=".LabourerHomeActivity"></activity>
+        <activity android:name=".LabourerHomeActivity" />
         <activity android:name=".CustomerHistoryActivity" />
         <activity android:name=".CustomerJobsActivity" />
         <activity android:name=".GeoFireActivity" />
@@ -93,6 +95,11 @@
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
         <activity
             android:name=".DetailServiceActivity"
+            android:label="@string/title_activity_detail_service2"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
+        <activity
+            android:name=".DetailAcceptedServiceActivity"
             android:label="@string/title_activity_detail_service2"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
@@ -163,7 +170,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        
+
         <service android:name=".notifications.NotificationService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_larger"
-            android:text="Tags"
+            android:text="Title"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_size_small" />
 
@@ -25,6 +25,7 @@
             android:id="@+id/service_description_tv_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/black"
             android:text=" TAG1 TAG2 TAG3"
             android:textSize="@dimen/text_size_normal" />
 
@@ -43,7 +44,8 @@
             android:id="@+id/service_description_tv_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_normal" />
+            android:textSize="@dimen/text_size_normal"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/service_description_tv_skill"
@@ -52,8 +54,27 @@
             android:layout_marginTop="@dimen/margin_larger"
             android:layout_marginBottom="@dimen/text_size_larger"
             android:text="Skill"
+            android:drawableBottom="@drawable/ic_carpenter_tools_colour"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/service_description_tv_start_time"
+            android:layout_width="match_parent"
+            android:layout_marginEnd="@dimen/margin_large"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:text="Start Time"
+            android:ems="20"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            android:id="@+id/service_description_tv_start_time_fill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_normal"
+            android:textColor="@color/black"/>
 
     </LinearLayout>
 

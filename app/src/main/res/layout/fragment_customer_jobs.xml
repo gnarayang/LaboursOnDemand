@@ -50,7 +50,10 @@
                 android:layout_marginTop="8dp"
                 android:text="Job Description here"
                 app:layout_constraintStart_toEndOf="@+id/customer_jobs_toolbox"
-                app:layout_constraintTop_toBottomOf="@+id/customer_jobs_title" />
+                app:layout_constraintTop_toBottomOf="@+id/customer_jobs_title"
+                android:maxLines="1"
+                android:maxLength="30"
+                android:ellipsize="end"/>
 
             <ImageView
                 android:id="@+id/customer_jobs_st_iv"
@@ -63,14 +66,24 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
+                android:id="@+id/customer_jobs_start_time1_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Date"
+                app:layout_constraintBottom_toBottomOf="@+id/customer_jobs_st_iv"
+                app:layout_constraintStart_toEndOf="@+id/customer_jobs_st_iv"
+                app:layout_constraintTop_toTopOf="@+id/customer_jobs_st_iv" />
+
+            <TextView
                 android:id="@+id/customer_jobs_start_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
                 android:text="Time"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/customer_jobs_toolbox" />
+                app:layout_constraintBottom_toBottomOf="@+id/customer_jobs_start_time1_tv"
+                app:layout_constraintStart_toEndOf="@+id/customer_jobs_start_time1_tv"
+                app:layout_constraintTop_toTopOf="@+id/customer_jobs_start_time1_tv" />
 
             <Button
                 android:id="@+id/customer_jobs_done_btn"
@@ -98,11 +111,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/customer_jobs_fragment_cv">
 
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="25dp">
-
-        </Spinner>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/customer_jobs_rv"
@@ -110,13 +118,46 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:clipToPadding="false"
             android:padding="10dp"
             android:scrollbars="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/customer_jobs_sort_btn" />
+
+        <TextView
+            android:id="@+id/customer_jobs_sortby"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Sort by"
+            app:layout_constraintEnd_toStartOf="@+id/customer_jobs_sort_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/customer_jobs_sort_btn"
+            android:layout_width="56dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/orange"
+            android:text="Prices"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toStartOf="@+id/customer_jobs_sort1_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/customer_jobs_sort1_btn"
+            android:layout_width="56dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/orange"
+            android:text="Rating"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>

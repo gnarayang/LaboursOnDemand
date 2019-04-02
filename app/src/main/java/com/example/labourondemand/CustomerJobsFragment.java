@@ -29,8 +29,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.StringTokenizer;
 
 import static android.support.constraint.Constraints.TAG;
 
@@ -96,8 +99,10 @@ public class CustomerJobsFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
     private TextView noResponse;
-    private Button done;
     private ImageView skillPic;
+    private Button done, sortPrice, sortRating;
+    private TextView jobTitle, jobDescription, startTime, startDate;
+    private SessionManager sessionManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -109,6 +114,7 @@ public class CustomerJobsFragment extends Fragment {
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
+        sessionManager = new SessionManager(view.getContext());
 //        Spinner spin = (Spinner) view.findViewById(R.id.spinner);
 //        spin.setOnItemSelectedListener();
 //
@@ -118,6 +124,46 @@ public class CustomerJobsFragment extends Fragment {
 //        //Setting the ArrayAdapter data on the Spinner
 //        spin.setAdapter(aa);
 
+        /*Spinner spin = (Spinner) view.findViewById(R.id.spinner);
+        spin.setOnItemSelectedListener();*/
+
+        jobTitle = view.findViewById(R.id.customer_jobs_title);
+        jobDescription = view.findViewById(R.id.customer_jobs_jobDescription);
+        startTime = view.findViewById(R.id.customer_jobs_start_time_tv);
+        startDate = view.findViewById(R.id.customer_jobs_start_time1_tv);
+
+        jobTitle.setText(currentService.getTitle());
+        jobDescription.setText(currentService.getDescription());
+
+        //show correct date and time
+        StringTokenizer tokenizer = new StringTokenizer(currentService.getStartTime(), "/");
+        String stTime = "", stDate = "";
+
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken());
+
+        //format to indian form date
+//        String pattern = "dd/MM/yyyy";
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+//
+//        try {
+//            stDate = new SimpleDateFormat("dd/MM/yyyy").format(simpleDateFormat.parse(stDate));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken() + ":");
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken());
+
+
+        startTime.setText(stTime);
+        startDate.setText(stDate);
 
         skillPic = view.findViewById(R.id.customer_jobs_toolbox);
 
@@ -141,9 +187,15 @@ public class CustomerJobsFragment extends Fragment {
         {
             skillPic.setImageDrawable(view.getContext().getDrawable(R.drawable.ic_cooking_colour));
         }
+       /* //Creating the ArrayAdapter instance having the country list
+        ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,country);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);*/
 
         done = view.findViewById(R.id.customer_jobs_done_btn);
-
+        sortPrice = view.findViewById(R.id.customer_jobs_sort_btn);
+        sortRating = view.findViewById(R.id.customer_jobs_sort1_btn);
         Log.d("currentService", currentService.toString() + "!");
         Log.d("customerinFragment", customer.toString() + "!");
 
@@ -151,14 +203,34 @@ public class CustomerJobsFragment extends Fragment {
         if (currentService.getLabourers() == null) {
             currentService.setLabourers(new ArrayList<>());
         }
-        customerJobsAdapter = new CustomerJobsAdapter(getActivity(), currentService);
+
+        customerJobsAdapter = new CustomerJobsAdapter(getActivity(), currentService, customer);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(customerJobsAdapter);
         recyclerView.setHasFixedSize(false);
 
+        sortPrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(customerJobsAdapter.getItemCount() != 0)
+                    sortLabourerBasedOnPrice();
+            }
+        });
+
+        sortRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(customerJobsAdapter.getItemCount() != 0)
+                    sortLabourerBasedOnRating();
+            }
+        });
+
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Log.d("service in done",currentService.toString()+"!");
+                Log.d("service from adapter",customerJobsAdapter.getService().toString());
                 String st = "";
                 int mYear, mMonth, mDay, mHour, mMinute;
                 final Calendar c = Calendar.getInstance();
@@ -170,45 +242,50 @@ public class CustomerJobsFragment extends Fragment {
 
                 st = st+mYear+"/"+mMonth+"/"+mDay;
                 st = st+"/"+mHour+"/"+mMinute;
-               /* if(customerJobsAdapter.isDone()){
+                if(customerJobsAdapter.isDone()){
+                   Log.d("isDONE",customerJobsAdapter.getService().getCustomerUID()+"!");
 
+                    firebaseFirestore.collection("services").document(currentService.getServiceId())
+                            .update("endTime",st)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    firebaseFirestore.collection("customer").document(customer.getId())
+                                            .update("notPaidService",currentService.getServiceId(),
+                                                    "notReviewedService",currentService.getServiceId())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    customer.setNotPaidService(currentService.getServiceId());
+                                                    customer.setNotReviewedService(currentService.getServiceId());
+                                                    sessionManager.saveCustomer(customer);
+                                                    Intent intent = new Intent(view.getContext(),PaymentActivity.class);
+                                                    intent.putExtra("services",customerJobsAdapter.getService());
+                                                    intent.putExtra("customer",customer);
+                                                    startActivity(intent);
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d("No Failure222",e.toString()+"!");
+
+                                                }
+                                            });
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.d("No Failure111",e.toString()+"!");
+                                }
+                            });
                 }else{
-                    Toast.makeText(view.getContext(),"")
-                }*/
-
-               firebaseFirestore.collection("service").document(currentService.getServiceId())
-                       .update("endTime",st)
-                       .addOnSuccessListener(new OnSuccessListener<Void>() {
-                           @Override
-                           public void onSuccess(Void aVoid) {
-                               firebaseFirestore.collection("customer").document(customer.getId())
-                                       .update("notPaidService",currentService.getServiceId(),
-                                               "notReviewedService",currentService.getServiceId())
-                                       .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                           @Override
-                                           public void onSuccess(Void aVoid) {
-                                               Intent intent = new Intent(view.getContext(),PaymentActivity.class);
-                                               intent.putExtra("service",currentService);
-                                               intent.putExtra("customer",customer);
-                                               startActivity(intent);
-                                           }
-                                       })
-                                       .addOnFailureListener(new OnFailureListener() {
-                                           @Override
-                                           public void onFailure(@NonNull Exception e) {
-
-                                           }
-                                       });
+                    Toast.makeText(getContext(),"Labourer havent been assigned",Toast.LENGTH_LONG).show();
+                }
 
 
-                           }
-                       })
-                       .addOnFailureListener(new OnFailureListener() {
-                           @Override
-                           public void onFailure(@NonNull Exception e) {
-
-                           }
-                       });
             }
         });
 
@@ -225,8 +302,11 @@ public class CustomerJobsFragment extends Fragment {
 
                         if (snapshot != null && snapshot.exists()) {
                             Log.d(TAG, "Current data: " + snapshot.getData());
+                            Log.d("snapshotListen JOB frag",snapshot.getData()+"!");
                             ServicesFinal updatedService = snapshot.toObject(ServicesFinal.class);
-
+                            updatedService.setServiceId(snapshot.getId());
+                            updatedService.setApplyable(snapshot.getBoolean("isApplyable"));
+                            updatedService.setPaid(snapshot.getBoolean("isPaid"));
                             customerJobsAdapter.clear();
                             customerJobsAdapter.setService(updatedService);
 
@@ -239,6 +319,7 @@ public class CustomerJobsFragment extends Fragment {
                                                 @Override
                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                                                     LabourerFinal labourerFinal = documentSnapshot.toObject(LabourerFinal.class);
+                                                    labourerFinal.setId(documentSnapshot.getId());
                                                     customerJobsAdapter.addLabourer(labourerFinal);
                                                 }
                                             })
@@ -275,8 +356,12 @@ public class CustomerJobsFragment extends Fragment {
                     min = i;
                 }
             }
-            customerJobsAdapter.swapItems(i, min);
+            LabourerFinal tempLabourer = labourers.get(min);
+            labourers.set(min, labourers.get(i));
+            labourers.set(i, tempLabourer);
         }
+
+        customerJobsAdapter.setLabourers(labourers);
     }
 
     void sortLabourerBasedOnRating() {
@@ -289,9 +374,12 @@ public class CustomerJobsFragment extends Fragment {
                     max = i;
                 }
             }
-            customerJobsAdapter.swapItems(i, max);
+            LabourerFinal tempLabourer = labourers.get(max);
+            labourers.set(max, labourers.get(i));
+            labourers.set(i, tempLabourer);
         }
 
+        customerJobsAdapter.setLabourers(labourers);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

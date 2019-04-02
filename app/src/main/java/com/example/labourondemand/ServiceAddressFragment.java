@@ -5,10 +5,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 
 /**
@@ -19,11 +28,15 @@ import android.widget.TextView;
  * Use the {@link ServiceAddressFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ServiceAddressFragment extends Fragment {
+public class ServiceAddressFragment extends Fragment implements OnMapReadyCallback {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    private GoogleMap googleMap;
+
+    SupportMapFragment mapFragment ;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -53,6 +66,7 @@ public class ServiceAddressFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,15 +85,17 @@ public class ServiceAddressFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_service_address, container, false);
 
-        a1 = view.findViewById(R.id.service_address_tv_line1);
-        a2 = view.findViewById(R.id.service_address_tv_line2);
-        landmark = view.findViewById(R.id.service_address_tv_landmark);
-        city = view.findViewById(R.id.service_address_tv_city);
 
-        //city.setText(services.getCity());
-        //landmark.setText(services.getLandmark());
-        //  a1.setText(services.getAddressLine1());
-        //  a2.setText(services.getAddressLine2());
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        if(mapFragment == null){
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            mapFragment = SupportMapFragment.newInstance();
+            ft.replace(R.id.map,mapFragment).commit();
+
+        }
+
+        mapFragment.getMapAsync(this);
 
         return view;
     }
@@ -106,6 +122,14 @@ public class ServiceAddressFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng sydney = new LatLng(services.getDestinationLatitude(),services.getDestinationLongitude());
+        googleMap.addMarker(new MarkerOptions().position(sydney).title("asdf"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
     }
 
     /**

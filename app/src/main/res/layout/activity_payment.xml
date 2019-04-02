@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/review_abl"
+        android:id="@+id/payment_abl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/review_tb"
+            android:id="@+id/payment_tb"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
@@ -28,25 +28,25 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.CardView
-        android:id="@+id/review_cv"
+        android:id="@+id/payment_cv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="8dp"
+        android:elevation="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/review_abl"
-        android:layout_margin="16dp"
-        android:elevation="16dp">
+        app:layout_constraintTop_toBottomOf="@+id/payment_abl">
 
-        <android.support.constraint.ConstraintLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/parent_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/parent_layout">
+            android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/review_iv"
+                android:id="@+id/payment_iv"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginStart="8dp"
@@ -58,7 +58,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/review_title_tv"
+                android:id="@+id/payment_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -66,35 +66,38 @@
                 android:text="Water leakage"
                 android:textColor="#000"
                 android:textSize="@dimen/text_size_normal"
-                app:layout_constraintStart_toEndOf="@+id/review_iv"
+                app:layout_constraintStart_toEndOf="@+id/payment_iv"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/review_end_time"
+                android:visibility="gone"
+                android:id="@+id/payment_end_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
                 android:text="Sun, 11/03/2019 5:45PM"
                 android:textColor="#000"
-                android:layout_marginTop="8dp"
                 android:textSize="@dimen/text_size_normal"
-                app:layout_constraintTop_toBottomOf="@id/review_title_tv"
-                app:layout_constraintStart_toEndOf="@+id/review_iv"
+                app:layout_constraintStart_toEndOf="@+id/payment_iv"
+                app:layout_constraintTop_toBottomOf="@id/payment_title_tv"
                 tools:layout_editor_absoluteY="48dp" />
 
             <TextView
+                android:id="@+id/payment_numOfLabourers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_larger"
                 android:layout_marginTop="@dimen/margin_normal"
                 android:layout_marginBottom="@dimen/margin_large"
+                android:text="5 Plumbers"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/review_end_time"
-                app:layout_constraintStart_toEndOf="@+id/review_iv"
-                android:text="5 Plumbers"/>
+                app:layout_constraintStart_toEndOf="@+id/payment_iv"
+                app:layout_constraintTop_toBottomOf="@+id/payment_end_time" />
 
             <TextView
-                android:id="@+id/review_cost_tv"
+                android:visibility="gone"
+                android:id="@+id/payment_cost_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -113,31 +116,32 @@
 
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/review_rv"
-        android:layout_width="match_parent"
+        android:id="@+id/payment_rv"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:orientation="horizontal"
-        android:padding="8dp"
         android:foregroundGravity="center"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/review_cv">
+        app:layout_constraintTop_toBottomOf="@id/payment_cv">
 
     </android.support.v7.widget.RecyclerView>
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_larger"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginEnd="@dimen/margin_large"
-        app:layout_constraintBottom_toTopOf="@+id/payment_pay_btn"
+        android:elevation="@dimen/margin_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/review_pb"
-        android:elevation="@dimen/margin_large">
+        app:layout_constraintTop_toBottomOf="@+id/payment_rv">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -179,10 +183,10 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <ProgressBar
-        android:id="@+id/review_pb"
+        android:id="@+id/payment_pb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
