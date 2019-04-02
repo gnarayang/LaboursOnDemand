@@ -172,7 +172,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
             public void onPageSelected(int position) {
                 mMap.clear();
                 LatLng sydney = new LatLng(servicesFinalForLocation.get(position).getDestinationLatitude(), servicesFinalForLocation.get(position).getDestinationLongitude());
-                mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
 //                Location l1 = new Location("");
@@ -253,7 +253,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         Log.d("tag", "customer Home Activity onMapReady");
 
 //        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         if (!runtime_permissions(getApplicationContext(), max)) {
@@ -454,7 +454,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                                                    if(servicesFinalForLocation.size() == 1)
 //                                                    {
 //                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-//                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
 //                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 //
 //                                                        Location l1 = new Location("");
@@ -558,20 +558,63 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             //fetchServices(Double.POSITIVE_INFINITY);
-        } else if (position == 6) {
+        }
+        else if (position == 1)
+        {
+            Log.d("item", "cdsfcdcdscfdvdv" + position);
+            max = 1.0;
+//            if (!runtime_permissions(getApplicationContext(),max)) {
+//                Log.d("service onMapReady", "yessss");
+//            }
+                    Log.d("value of distance", max.toString());
+            fetchServices(max);
+        }
+        else if (position == 2)
+        {
+            Log.d("item", "cdsfcdcdscfdvdv" + position);
+            max = 2.0;
+//            if (!runtime_permissions(getApplicationContext(),max)) {
+//                Log.d("service onMapReady", "yessss");
+//            }
+            Log.d("value of distance", max.toString());
+            fetchServices(max);
+        }
+        else if (position == 3)
+        {
+            Log.d("item", "cdsfcdcdscfdvdv" + position);
+            max = 3.0;
+//            if (!runtime_permissions(getApplicationContext(),max)) {
+//                Log.d("service onMapReady", "yessss");
+//            }
+            Log.d("value of distance", max.toString());
+            fetchServices(max);
+        }
+        else if (position == 4)
+        {
+            Log.d("item", "cdsfcdcdscfdvdv" + position);
+            max = 5.0;
+//            if (!runtime_permissions(getApplicationContext(),max)) {
+//                Log.d("service onMapReady", "yessss");
+//            }
+            Log.d("value of distance", max.toString());
+            fetchServices(max);
+        }
+        else if (position == 5)
+        {
+            Log.d("item", "cdsfcdcdscfdvdv" + position);
+            max = 10.0;
+//            if (!runtime_permissions(getApplicationContext(),max)) {
+//                Log.d("service onMapReady", "yessss");
+//            }
+            Log.d("value of distance", max.toString());
+            fetchServices(max);
+        }
+        else if (position == 6) {
             Log.d("item", "vvfdvdv");
             max = Double.POSITIVE_INFINITY;
 //            if (!runtime_permissions(getApplicationContext(),max)) {
 //                Log.d("service onMapReady", "yessss");
 //            }
-            fetchServices(max);
-        } else {
-            Log.d("item", "cdsfcdcdscfdvdv" + position);
-            max = Double.valueOf(list[position]);
-//            if (!runtime_permissions(getApplicationContext(),max)) {
-//                Log.d("service onMapReady", "yessss");
-//            }
-            Log.d("value of distance", max.toString());
             fetchServices(max);
         }
 

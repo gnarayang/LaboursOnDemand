@@ -31,11 +31,11 @@
 
     <string-array name="array_distances">
         <item>none</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>5</item>
-        <item>10</item>
+        <item>within 1 km</item>
+        <item>within 2 kms</item>
+        <item>within 3 kms</item>
+        <item>within 5 kms</item>
+        <item>within 10 kms</item>
         <item>infinity</item>
 
     </string-array>
