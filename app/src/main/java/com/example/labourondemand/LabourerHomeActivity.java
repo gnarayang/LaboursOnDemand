@@ -175,19 +175,19 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                 mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-                Location l1 = new Location("");
-                l1.setLatitude(myLocation.getLatitude());
-                l1.setLongitude(myLocation.getLongitude());
-
-                Location l2 = new Location("");
-                l2.setLatitude(servicesFinalForLocation.get(position).getDestinationLatitude());
-                l2.setLongitude(servicesFinalForLocation.get(position).getDestinationLongitude());
-
-                distance = (l1.distanceTo(l2)) / 1000;
-
-                Bundle bundle = new Bundle();
-
-                bundle.putDouble("distance", distance);
+//                Location l1 = new Location("");
+//                l1.setLatitude(myLocation.getLatitude());
+//                l1.setLongitude(myLocation.getLongitude());
+//
+//                Location l2 = new Location("");
+//                l2.setLatitude(servicesFinalForLocation.get(position).getDestinationLatitude());
+//                l2.setLongitude(servicesFinalForLocation.get(position).getDestinationLongitude());
+//
+//                distance = (l1.distanceTo(l2)) / 1000;
+//
+//                Bundle bundle = new Bundle();
+//                Log.d("distance1",String.valueOf(distance));
+//                bundle.putDouble("distance1", distance);
             }
 
             @Override
@@ -401,10 +401,11 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 Log.d("tag", labourerFinal.getSkill() + "!" + documentSnapshot.get("skill") + "!" + documentSnapshot.getData().toString());
                                 // Log.d("service fetched", documentSnapshot.getString("serviceId"));
                                 ServicesFinal servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
+                                double distance = 0;
                                 servicesFinal.setServiceId(documentSnapshot.getId());
                                 servicesFinalForLocation.add(servicesFinal);
                                 //servicesFinal.setCustomerUID(documentSnapshot.getString("customerUID"));
-                                Log.d("I don't know", "+" + servicesFinal.toString() + "!" + servicesFinal.getDestinationLongitude() + "!");
+                                Log.d("I don't know", "+" + servicesFinal.toString() + "!"+ servicesFinal.getDestinationLongitude()+ "!");
                                 //final ServicesFinal finalServices = servicesFinal;
                                 //ServicesFinal finalServicesFinal = servicesFinal;
                                 //firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID())
@@ -413,23 +414,25 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 mMap.setMyLocationEnabled(true);
                                 myLocation = mMap.getMyLocation();
 
-//                                Location l1 = new Location("");
-//                                l1.setLatitude(myLocation.getLatitude());
-//                                l1.setLongitude(myLocation.getLongitude());
-//
-//                                Location l2 = new Location("");
-//                                l2.setLatitude(servicesFinal.getDestinationLatitude());
-//                                l2.setLongitude(servicesFinal.getDestinationLongitude());
+                                Location l1 = new Location("");
+                                l1.setLatitude(myLocation.getLatitude());
+                                l1.setLongitude(myLocation.getLongitude());
+
+                                Location l2 = new Location("");
+                                l2.setLatitude(servicesFinal.getDestinationLatitude());
+                                l2.setLongitude(servicesFinal.getDestinationLongitude());
+
 
 
                                 Log.d("My location", myLocation.toString() + "!");
 //                                Log.d("ser", servicesFinal.getDestinationLatitude() + "!" + servicesFinal.getDestinationLongitude()+"+"+(l1.distanceTo(l2)));
-                                Log.d("Service location", servicesFinal.getDestinationLatitude().toString() + " + " + servicesFinal.getDestinationLongitude().toString());
+                                Log.d("Service location",servicesFinal.getDestinationLatitude().toString() + " + " + servicesFinal.getDestinationLongitude().toString());
                                 serviceLocation.setLatitude(servicesFinal.getDestinationLatitude());
                                 serviceLocation.setLatitude(servicesFinal.getDestinationLatitude());
-//                                distance = (l1.distanceTo(l2))/1000;
-                                Log.d("distance", String.valueOf(distance));
+                                distance = (l1.distanceTo(l2))/1000;
+                                Log.d("distance",String.valueOf(distance));
                                 if (distance < max_distance) {
+                                    double finalDistance = distance;
                                     firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID()).get()
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
@@ -442,29 +445,31 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                                     Bundle bundle = new Bundle();
                                                     bundle.putSerializable("services", servicesFinal);
                                                     bundle.putSerializable("labourer", labourerFinal);
-                                                    //bundle.putDouble("distance", distance);
+                                                    //Continue coding from here. Pass the location here
+                                                    bundle.putDouble("distance", finalDistance);
                                                     CardVIewJobs cv = new CardVIewJobs();
                                                     cv.setArguments(bundle);
                                                     viewPagerAdapterLabourer.addFragment(cv, "cc");
                                                     viewPagerAdapterLabourer.notifyDataSetChanged();
-                                                    if (servicesFinalForLocation.size() == 1) {
-                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
-                                                        Location l1 = new Location("");
-                                                        l1.setLatitude(myLocation.getLatitude());
-                                                        l1.setLongitude(myLocation.getLongitude());
-
-                                                        Location l2 = new Location("");
-                                                        l2.setLatitude(servicesFinalForLocation.get(0).getDestinationLatitude());
-                                                        l2.setLongitude(servicesFinalForLocation.get(0).getDestinationLongitude());
-
-                                                        distance = (l1.distanceTo(l2)) / 1000;
-
-                                                        bundle.putDouble("distance", distance);
-
-                                                    }
+//                                                    if(servicesFinalForLocation.size() == 1)
+//                                                    {
+//                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
+//                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//
+//                                                        Location l1 = new Location("");
+//                                                        l1.setLatitude(myLocation.getLatitude());
+//                                                        l1.setLongitude(myLocation.getLongitude());
+//
+//                                                        Location l2 = new Location("");
+//                                                        l2.setLatitude(servicesFinalForLocation.get(0).getDestinationLatitude());
+//                                                        l2.setLongitude(servicesFinalForLocation.get(0).getDestinationLongitude());
+//
+//                                                        distance = (l1.distanceTo(l2))/1000;
+//                                                        Log.d("distance",String.valueOf(distance));
+//                                                        bundle.putDouble("distance",distance);
+//
+//                                                    }
                                                     //viewPager.setAdapter(viewPagerAdapterLabourer);
 
                                                     // To add code to add to viewPager
