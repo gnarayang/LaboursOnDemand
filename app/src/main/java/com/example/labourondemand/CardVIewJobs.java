@@ -210,7 +210,7 @@ public class CardVIewJobs extends Fragment {
                             TextView name = view.findViewById(R.id.fragment_card_view_jobs_tv_name);
                             name.setText(customerFinal.getName());
                             TextView title = view.findViewById(R.id.fragment_card_view_jobs_tv_title);
-                            title.setText(servicesFinal.getTitle());
+                            title.setText("  " + servicesFinal.getTitle());
                             CircleImageView image = view.findViewById(R.id.fragment_card_view_jobs_civ_photo);
                             if(customerFinal.getImage() != "null"){
                                 Glide.with(view.getContext()).load(customerFinal.getImage()).into(image);

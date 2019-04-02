@@ -433,6 +433,13 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 if (distance < max_distance) {
                                     double finalDistance = distance;
                                     servicesFinalForLocation.add(servicesFinal);
+                                    Log.d("Added to location",servicesFinal.toString() + "!!!" + servicesFinalForLocation.size());
+                                    if(servicesFinalForLocation.size() == 1) {
+                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
+                                        Log.d("First location", sydney.toString());
+                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
+                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                    }
                                     firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID()).get()
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
@@ -451,12 +458,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                                     cv.setArguments(bundle);
                                                     viewPagerAdapterLabourer.addFragment(cv, "cc");
                                                     viewPagerAdapterLabourer.notifyDataSetChanged();
-                                                    if(servicesFinalForLocation.size() == 1)
-                                                    {
-                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-                                                        Log.d("First location",sydney.toString());
-                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
-                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
 
 //                                                        Location l1 = new Location("");
 //                                                        l1.setLatitude(myLocation.getLatitude());
@@ -469,8 +471,6 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                                                        distance = (l1.distanceTo(l2))/1000;
 //                                                        Log.d("distance",String.valueOf(distance));
 //                                                        bundle.putDouble("distance",distance);
-
-                                                    }
                                                     //viewPager.setAdapter(viewPagerAdapterLabourer);
 
                                                     // To add code to add to viewPager
