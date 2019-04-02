@@ -75,7 +75,8 @@
         -->
         <activity android:name=".LabourerJobsActivity" />
         <activity android:name=".LabourerHistoryActivity" />
-        <activity android:name=".LabourerHomeActivity" />
+        <activity android:name=".LabourerHomeActivity"
+            android:label="Home"/>
         <activity android:name=".CustomerHistoryActivity" />
         <activity android:name=".CustomerJobsActivity" />
         <activity android:name=".GeoFireActivity" />
@@ -95,7 +96,7 @@
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
         <activity
             android:name=".DetailServiceActivity"
-            android:label="@string/title_activity_detail_service2"
+            android:label="Job Details"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
         <activity

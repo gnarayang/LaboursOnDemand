@@ -403,7 +403,6 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 ServicesFinal servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
                                 double distance = 0;
                                 servicesFinal.setServiceId(documentSnapshot.getId());
-                                servicesFinalForLocation.add(servicesFinal);
                                 //servicesFinal.setCustomerUID(documentSnapshot.getString("customerUID"));
                                 Log.d("I don't know", "+" + servicesFinal.toString() + "!"+ servicesFinal.getDestinationLongitude()+ "!");
                                 //final ServicesFinal finalServices = servicesFinal;
@@ -433,6 +432,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                 Log.d("distance",String.valueOf(distance));
                                 if (distance < max_distance) {
                                     double finalDistance = distance;
+                                    servicesFinalForLocation.add(servicesFinal);
                                     firebaseFirestore.collection("customer").document(servicesFinal.getCustomerUID()).get()
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
@@ -451,12 +451,13 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                                     cv.setArguments(bundle);
                                                     viewPagerAdapterLabourer.addFragment(cv, "cc");
                                                     viewPagerAdapterLabourer.notifyDataSetChanged();
-//                                                    if(servicesFinalForLocation.size() == 1)
-//                                                    {
-//                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
-//                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
-//                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//
+                                                    if(servicesFinalForLocation.size() == 1)
+                                                    {
+                                                        LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
+                                                        Log.d("First location",sydney.toString());
+                                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
+                                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
 //                                                        Location l1 = new Location("");
 //                                                        l1.setLatitude(myLocation.getLatitude());
 //                                                        l1.setLongitude(myLocation.getLongitude());
@@ -468,8 +469,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                                                        distance = (l1.distanceTo(l2))/1000;
 //                                                        Log.d("distance",String.valueOf(distance));
 //                                                        bundle.putDouble("distance",distance);
-//
-//                                                    }
+
+                                                    }
                                                     //viewPager.setAdapter(viewPagerAdapterLabourer);
 
                                                     // To add code to add to viewPager
