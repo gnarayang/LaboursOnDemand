@@ -30,14 +30,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -219,7 +222,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                 LatLng sydney = new LatLng(servicesFinalForLocation.get(position).getDestinationLatitude(), servicesFinalForLocation.get(position).getDestinationLongitude());
                 mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-
+                Log.d("Location " + position, sydney.toString());
 //                Location l1 = new Location("");
 //                l1.setLatitude(myLocation.getLatitude());
 //                l1.setLongitude(myLocation.getLongitude());
@@ -489,9 +492,13 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                         viewPagerAdapterLabourer.notifyDataSetChanged();
                                         mMap.clear();
                                         LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
+                                        LatLng myLocationLatLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
                                         Log.d("First location", sydney.toString());
                                         mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                        TextView textView;
+                                        textView = (TextView)findViewById(R.id.labourer_home_tv_error);
+                                        textView.setVisibility(View.INVISIBLE);
                                     }
                                     else {
 //                                        Log.d("doc00", documentSnapshot1.getData() + "!00");
@@ -602,6 +609,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             //fetchServices(Double.POSITIVE_INFINITY);
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
         } else if (position == 1) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
             max = 1.0;
@@ -609,6 +618,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             Log.d("value of distance", max.toString());
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         } else if (position == 2) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
@@ -617,6 +628,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             Log.d("value of distance", max.toString());
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         } else if (position == 3) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
@@ -625,6 +638,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             Log.d("value of distance", max.toString());
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         } else if (position == 4) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
@@ -633,6 +648,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             Log.d("value of distance", max.toString());
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         } else if (position == 5) {
             Log.d("item", "cdsfcdcdscfdvdv" + position);
@@ -641,6 +658,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //                Log.d("service onMapReady", "yessss");
 //            }
             Log.d("value of distance", max.toString());
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         } else if (position == 6) {
             Log.d("item", "vvfdvdv");
@@ -648,6 +667,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 //            if (!runtime_permissions(getApplicationContext(),max)) {
 //                Log.d("service onMapReady", "yessss");
 //            }
+            TextView textView = findViewById(R.id.labourer_home_tv_error);
+            textView.setVisibility(View.VISIBLE);
             fetchServices(max);
         }
 
@@ -656,6 +677,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         Log.d("nothing", "dccv");
+        TextView textView = findViewById(R.id.labourer_home_tv_error);
+        textView.setVisibility(View.VISIBLE);
         //fetchServices(Double.POSITIVE_INFINITY);
     }
 }
