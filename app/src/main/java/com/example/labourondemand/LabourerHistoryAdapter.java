@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -58,7 +59,26 @@ public class LabourerHistoryAdapter extends RecyclerView.Adapter<LabourerHistory
         ServicesFinal service = services.get(viewHolder.getAdapterPosition());
 
         viewHolder.jobcost.setText(String.valueOf(service.getCustomerAmount()));
-        viewHolder.date.setText(service.getEndTime());
+
+
+        StringTokenizer tokenizer = new StringTokenizer(service.getStartTime(), "/");
+        String stTime = "", stDate = "";
+
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken() + "/");
+        if(tokenizer.hasMoreTokens())
+            stDate += (tokenizer.nextToken());
+
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken() + ":");
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken());
+
+
+        viewHolder.date.setText(stDate);
+        viewHolder.time.setText(stTime);
         viewHolder.jobTitle.setText(service.getTitle());
         Glide.with(context).load(service.getImages().get(0)).into(viewHolder.labourerImage);
 
@@ -87,7 +107,7 @@ public class LabourerHistoryAdapter extends RecyclerView.Adapter<LabourerHistory
 
         }
 
-        viewHolder.time.setText(service.getStartTime());
+
 
     }
 

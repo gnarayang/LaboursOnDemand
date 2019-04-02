@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.example.labourondemand.R;
 
@@ -23,6 +24,8 @@ public class NotificationHelper {
     }
 
     public static void displayNotification(Context context,String Title,String Body){
+
+        mContext = context;
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel(CHANNEl_ID,CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
@@ -50,8 +53,13 @@ public class NotificationHelper {
 
 //        NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
 //        mNotificationManager.notify(1,mBuilder.build());
+        Log.d("Notification he" +
+                "lper",mContext+"");
+        Log.d("Notification helper",context+"");
+        Log.d("Notification helper",context.NOTIFICATION_SERVICE+"");
+        NotificationManager notificationManager =(NotificationManager) mContext.getSystemService(context.NOTIFICATION_SERVICE);
 
-        NotificationManager notificationManager =(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
         notificationManager.notify(1,mBuilder.build());
 
     }
