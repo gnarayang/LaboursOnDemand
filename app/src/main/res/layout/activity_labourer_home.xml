@@ -135,4 +135,12 @@
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/menu_navigation_drawer" />
 
+    <TextView
+        android:id="@+id/labourer_home_tv_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select an appropriate distance willing to travel to see jobs"
+        android:gravity="center"
+        android:padding="8dp"/>
+
 </android.support.v4.widget.DrawerLayout>
