@@ -2,6 +2,7 @@ package com.example.labourondemand;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,8 +31,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -44,6 +50,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 
@@ -76,11 +88,55 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
     private Double max = 0.0;
     private Spinner spinner;
 
+    static LabourerHomeActivity instance;
+    LocationRequest locationRequest;
+    FusedLocationProviderClient fusedLocationProviderClient;
+
+    public static LabourerHomeActivity getInstance() {
+        return instance;
+    }
+    TextView textView;
+
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_labourer_home);
+
+        instance = this;
+        labourerFinal = (LabourerFinal) getIntent().getExtras().get("labourer");
+
+        textView = findViewById(R.id.labourer_home_no_response_tv);
+
+       /* Dexter.withActivity(this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        Log.d("permission",response.toString());
+                        updateLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        Toast.makeText(LabourerHomeActivity.this, "you nsna", Toast.LENGTH_LONG).show();
+                        Log.d("permissiondenied",response.toString());
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        Log.d("permission ratio",permission.toString());
+                    }
+
+
+                }).check();*/
+
+       Intent intent = new Intent(this,MyLocationService.class);
+       intent.putExtra("labourer",labourerFinal);
+        this.startService(intent);
+
+
+//        startService(new Intent(this,MyLocationService .class));
 
         spinner = findViewById(R.id.sp);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -116,7 +172,6 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         //viewPagerAdapterLabourer.addFragment(new CardVIewJobs(),"cdc");
         viewPager.setAdapter(viewPagerAdapterLabourer);
 
-        labourerFinal = (LabourerFinal) getIntent().getExtras().get("labourer");
         Log.d("labourerHome", labourerFinal.toString());
 
        /* slide = new Slide(this, new ArrayList<String>());
@@ -159,6 +214,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
         //viewPager.setAdapter(viewPagerAdapterLabourer);
 
+
+
+
         //Spinner spinner = (Spinner) findViewById(R.id.labourer_home_sp);
         spinner.setOnItemSelectedListener(this);
 
@@ -196,6 +254,58 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
             }
         });
 
+    }
+
+    private void updateLocation() {
+        buildLocationRequest();
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
+
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d("onrestart","1");
+        super.onRestart();
+        Log.d("onrestart","2");
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("ondestroy","1");
+        super.onDestroy();
+        Log.d("ondestroy","2");
+    }
+
+    public void update(final String value)
+    {
+
+        LabourerHomeActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("location brodcast ",value+"!");
+                textView.setText(value);
+            }
+        });
+    }
+
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this,MyLocation.class);
+        intent.setAction(MyLocation.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(2000);
+        locationRequest.setFastestInterval(1000);
+        locationRequest.setSmallestDisplacement(10f);
     }
 
     private Boolean runtime_permissions(Context context, Double max) {

@@ -25,6 +25,8 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ThankYouActivity"></activity>
+
+        <service android:enabled="true" android:name=".MyLocationService"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -42,6 +44,8 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
+
+
         <!--
  <service
             android:name=".notifications.MyService"
@@ -65,14 +69,8 @@
             android:name=".Form2Activity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WalletActivity"
-            android:screenOrientation="portrait" />
-        <!--
-<activity
-            android:name=".Dummy"
-            android:label="@string/title_activity_dummy"
-            android:theme="@style/AppTheme.NoActionBar.NoActionBar"></activity>
-        -->
+            android:name=".WalletActivity"/>
+
         <activity android:name=".LabourerJobsActivity" />
         <activity android:name=".LabourerHistoryActivity" />
         <activity android:name=".LabourerHomeActivity" />
