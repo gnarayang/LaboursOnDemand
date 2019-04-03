@@ -319,7 +319,8 @@ public class Form2Activity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
-                        st = st+year+"/"+(monthOfYear+1)+"/"+dayOfMonth;
+
+                        st = st+year+"/"+ (monthOfYear + 1) +"/"+dayOfMonth;
 
                         TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
                                 new TimePickerDialog.OnTimeSetListener() {

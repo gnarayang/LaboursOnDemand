@@ -159,6 +159,30 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <ImageView
+            android:id="@+id/customer_jobs_iv_no_labourer"
+            android:layout_width="143dp"
+            android:layout_height="229dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="128dp"
+            android:src="@drawable/ic_bad_employee"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/customer_jobs_tv_no_labourer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="No labourer has accepted your job so far!"
+            app:layout_constraintBottom_toBottomOf="@+id/customer_jobs_iv_no_labourer"
+            app:layout_constraintEnd_toEndOf="@+id/customer_jobs_iv_no_labourer"
+            app:layout_constraintStart_toStartOf="@+id/customer_jobs_iv_no_labourer" />
+
 
     </android.support.constraint.ConstraintLayout>
 

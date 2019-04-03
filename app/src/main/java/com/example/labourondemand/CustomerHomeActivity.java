@@ -97,17 +97,17 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
 
     private static final String TAG = "CustomerHomeActivity";
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Bundle bundle = new Bundle();
-        Log.d("tag", "onSaveInstanceState");
-
-        outState.putString("skill", horizontalScrollViewAdapter.getSkill());
-        //outState.putSerializable("labourersLocation", horizontalScrollViewAdapter.getLabourersLocation());
-        //customer.setLabourersLocation(horizontalScrollViewAdapter.getLabourersLocation());
-        outState.putSerializable("customer", customer);
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        Bundle bundle = new Bundle();
+//        Log.d("tag", "onSaveInstanceState");
+//
+//        outState.putString("skill", horizontalScrollViewAdapter.getSkill());
+//        //outState.putSerializable("labourersLocation", horizontalScrollViewAdapter.getLabourersLocation());
+//        //customer.setLabourersLocation(horizontalScrollViewAdapter.getLabourersLocation());
+//        outState.putSerializable("customer", customer);
+//        super.onSaveInstanceState(outState);
+//    }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -178,6 +178,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapView = mapFragment.getView();
 
+        toolbar = findViewById(R.id.customer_home_tb);
         toolbar = findViewById(R.id.customer_home_tb);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

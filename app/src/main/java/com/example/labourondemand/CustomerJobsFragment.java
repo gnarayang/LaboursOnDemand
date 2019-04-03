@@ -13,10 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,9 +26,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
@@ -102,6 +97,8 @@ public class CustomerJobsFragment extends Fragment {
     private ImageView skillPic;
     private Button done, sortPrice, sortRating;
     private TextView jobTitle, jobDescription, startTime, startDate;
+    private ImageView noLabourerImage;
+    private TextView noLabourertv;
     private SessionManager sessionManager;
 
     @Override
@@ -139,12 +136,59 @@ public class CustomerJobsFragment extends Fragment {
         StringTokenizer tokenizer = new StringTokenizer(currentService.getStartTime(), "/");
         String stTime = "", stDate = "";
 
+        String year = "", month = "", day = "";
+
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken() + "/");
+            year = tokenizer.nextToken();
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken() + "/");
+            month = tokenizer.nextToken();
         if(tokenizer.hasMoreTokens())
-            stDate += (tokenizer.nextToken());
+            day = tokenizer.nextToken();
+
+        stDate += (day + " ");
+
+        switch(month) {
+            case "1":
+                stDate += "Jan";
+                break;
+            case "2":
+                stDate += "Feb";
+                break;
+            case "3":
+                stDate += "Mar";
+                break;
+            case "4":
+                stDate += "Apr";
+                break;
+            case "5":
+                stDate += "May";
+                break;
+            case "6":
+                stDate += "June";
+                break;
+            case "7":
+                stDate += "July";
+                break;
+            case "8":
+                stDate += "Aug";
+                break;
+            case "9":
+                stDate += "Sep";
+                break;
+            case "10":
+                stDate += "Oct";
+                break;
+            case "11":
+                stDate += "Nov";
+                break;
+            case "12":
+                stDate += "Dec";
+                break;
+            default:
+                stDate += "Inv";
+        }
+
+        stDate += (" " + year);
 
         //format to indian form date
 //        String pattern = "dd/MM/yyyy";
@@ -289,6 +333,12 @@ public class CustomerJobsFragment extends Fragment {
             }
         });
 
+
+        //for no labourer response
+        noLabourerImage = view.findViewById(R.id.customer_jobs_iv_no_job);
+        noLabourertv = view.findViewById(R.id.customer_jobs_tv_no_job);
+
+
         firebaseFirestore.collection("services").document(currentService.getServiceId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
@@ -311,6 +361,11 @@ public class CustomerJobsFragment extends Fragment {
                             customerJobsAdapter.setService(updatedService);
 
                             if (updatedService.getLabourerResponses() != null) {
+
+                                //bad labourer image
+                                noLabourerImage.setVisibility(View.GONE);
+                                noLabourertv.setVisibility(View.GONE);
+
                                 for (String s : updatedService.getLabourerResponses().keySet()) {
 
                                     firebaseFirestore.collection("labourer").document(s)
@@ -337,6 +392,8 @@ public class CustomerJobsFragment extends Fragment {
                                 customerJobsAdapter.addLabourer(labourersToBeAdded.get(i));
                             }*/
                         } else {
+                            noLabourerImage.setVisibility(View.VISIBLE);
+                            noLabourertv.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Current data: null");
                         }
 
