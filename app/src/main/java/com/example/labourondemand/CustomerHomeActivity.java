@@ -31,9 +31,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -97,6 +100,8 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
 
     private static final String TAG = "CustomerHomeActivity";
 
+    private TextView nameHeader;
+    private ImageView photoHeader;
     @Override
     public void onSaveInstanceState(Bundle outState) {
         Bundle bundle = new Bundle();
@@ -163,7 +168,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
                                 });
                         // Log and toast
                         //String msg = getString(R.string.msg_token_fmt, token);
-                        Log.d("dcs", token);
+                        Log.d("CustomerHomeActivity", token);
                         Toast.makeText(CustomerHomeActivity.this, token, Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -253,7 +258,12 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
         getSupportActionBar().setHomeButtonEnabled(true);*/
 
 
-        navigationView.setCheckedItem(1);
+        navigationView.getMenu().getItem(0).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(customer.getName());
+        Glide.with(context).load(customer.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(1).setChecked(true);
@@ -740,5 +750,14 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
     @Override
     public void onProviderDisabled(String provider) {
         Log.d("onProviderDisabled", "provider:" + provider);
+    }
+
+    @SuppressLint("ResourceType")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("customerHome","onres");
+        //navigationView = findViewById(R.id.customer_jobs_nv);
+        navigationView.getMenu().getItem(0).setChecked(true);
     }
 }

@@ -29,11 +29,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -96,6 +98,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         return instance;
     }
     TextView textView;
+
+    private TextView nameHeader;
+    private ImageView photoHeader;
 
     @SuppressLint("ResourceType")
     @Override
@@ -160,9 +165,16 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.getMenu().getItem(0).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(labourerFinal.getName());
+        Glide.with(getApplicationContext()).load(labourerFinal.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(1).setChecked(true);
+
         viewPager = findViewById(R.id.labourer_home_vp);
         viewPagerAdapterLabourer = new ViewPagerAdapterLabourer(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapterLabourer);
@@ -273,6 +285,8 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         Log.d("onrestart","1");
         super.onRestart();
         Log.d("onrestart","2");
+
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 
     @Override
@@ -687,4 +701,6 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         Log.d("nothing", "dccv");
         //fetchServices(Double.POSITIVE_INFINITY);
     }
+
+
 }

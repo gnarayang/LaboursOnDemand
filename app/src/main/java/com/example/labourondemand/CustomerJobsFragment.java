@@ -98,11 +98,11 @@ public class CustomerJobsFragment extends Fragment {
     private CustomerJobsAdapter customerJobsAdapter;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private TextView noResponse;
     private ImageView skillPic;
     private Button done, sortPrice, sortRating;
     private TextView jobTitle, jobDescription, startTime, startDate;
     private SessionManager sessionManager;
+    private TextView noResponse;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,7 +110,6 @@ public class CustomerJobsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_customer_jobs, container, false);
 
-        noResponse = view.findViewById(R.id.customer_dashboard2_tv_no_response);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -126,7 +125,7 @@ public class CustomerJobsFragment extends Fragment {
 
         /*Spinner spin = (Spinner) view.findViewById(R.id.spinner);
         spin.setOnItemSelectedListener();*/
-
+        noResponse = view.findViewById(R.id.jobs_tv_empty_text);
         jobTitle = view.findViewById(R.id.customer_jobs_title);
         jobDescription = view.findViewById(R.id.customer_jobs_jobDescription);
         startTime = view.findViewById(R.id.customer_jobs_start_time_tv);
@@ -250,6 +249,7 @@ public class CustomerJobsFragment extends Fragment {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    customer = sessionManager.getCustomer(customer.getId());
                                     firebaseFirestore.collection("customer").document(customer.getId())
                                             .update("notPaidService",currentService.getServiceId(),
                                                     "notReviewedService",currentService.getServiceId())
@@ -311,6 +311,7 @@ public class CustomerJobsFragment extends Fragment {
                             customerJobsAdapter.setService(updatedService);
 
                             if (updatedService.getLabourerResponses() != null) {
+                                noResponse.setVisibility(View.GONE);
                                 for (String s : updatedService.getLabourerResponses().keySet()) {
 
                                     firebaseFirestore.collection("labourer").document(s)
@@ -330,6 +331,9 @@ public class CustomerJobsFragment extends Fragment {
                                                 }
                                             });
                                 }
+                            }
+                            else{
+                                noResponse.setVisibility(View.VISIBLE);
                             }
                             /*ArrayList<LabourerFinal> labourersToBeAdded = updatedService.getLabourers();
                             labourersToBeAdded.removeAll(currentService.getLabourers());

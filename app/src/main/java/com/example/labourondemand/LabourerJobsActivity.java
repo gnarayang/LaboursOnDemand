@@ -13,7 +13,11 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -26,7 +30,9 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
     private FirebaseAuth firebaseAuth;
     private String tag = LabourerHomeActivity.class.getName();
     private BottomNavigationView navigation;
-
+    private TextView nameHeader;
+    private ImageView photoHeader;
+    private LabourerFinal labourerFinal;
 
     @SuppressLint("ResourceType")
     @Override
@@ -39,15 +45,23 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
         navigationView = findViewById(R.id.labourer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
 
+        labourerFinal = (LabourerFinal) getIntent().getExtras().get("labourer");
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.getMenu().getItem(2).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(labourerFinal.getName());
+        Glide.with(getApplicationContext()).load(labourerFinal.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(2).setChecked(true);
+
 
 
 

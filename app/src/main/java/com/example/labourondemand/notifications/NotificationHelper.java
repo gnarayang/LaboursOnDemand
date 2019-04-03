@@ -22,6 +22,8 @@ public class NotificationHelper {
 
     public static void displayNotification(Context context,String Title,String Body){
 
+        mContext = context;
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationChannel channel = new NotificationChannel(CHANNEl_ID,CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(CHANNEL_DESC);

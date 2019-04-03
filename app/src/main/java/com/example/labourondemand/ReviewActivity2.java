@@ -243,7 +243,7 @@ public class ReviewActivity2 extends AppCompatActivity {
 
                                             Api api = retrofit.create(Api.class);
                                             String title = "Your work has been reviewed by Customer";
-                                            String body = "Rating: " + servicesFinal.getRating().toString();
+                                            String body = "Rating: " + ratingBar.getRating();
                                             Call<ResponseBody> call = api.sendNotification(token,title,body);
 
                                             call.enqueue(new Callback<ResponseBody>() {
@@ -314,7 +314,7 @@ public class ReviewActivity2 extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         progressBar.setVisibility(View.GONE);
-                                        Log.d("failure",e.toString());
+                                        Log.d("failure2",e.toString());
 
 
                                     }
@@ -326,7 +326,7 @@ public class ReviewActivity2 extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         progressBar.setVisibility(View.GONE);
-                        Log.d("failure",e.toString());
+                        Log.d("failure1",e.toString());
                     }
                 });
     }

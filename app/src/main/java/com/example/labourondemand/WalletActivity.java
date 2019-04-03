@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class WalletActivity extends AppCompatActivity {
     private String type;
     private FirebaseFirestore firebaseFirestore;
     private SessionManager sessionManager;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class WalletActivity extends AppCompatActivity {
         sessionManager = new SessionManager(getApplicationContext());
 
         toolbar = findViewById(R.id.customer_wallet_tb);
+        progressBar = findViewById(R.id.wallet_pb);
         toolbar.setTitle("Wallet");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -63,24 +66,26 @@ public class WalletActivity extends AppCompatActivity {
         updateBalance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alert(v, false);
+                alertUpdateBalance(v);
             }
         });
 
         checkBalance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alert(v, true);
+                alertCheckBalance(v);
             }
         });
     }
 
-    public void alert(View v, Boolean b) {
+    private void alertUpdateBalance(View v) {
+        balance.setVisibility(View.VISIBLE);
+        wallet.setVisibility(View.VISIBLE);
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
 
 // ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = LayoutInflater.from(v.getContext());
-        final View dialogView = inflater.inflate(R.layout.dialog_confirm_password, null);
+        final View dialogView = inflater.inflate(R.layout.dialog_update_wallet, null);
         builder.setView(dialogView);
 
         builder.setTitle("Confirm Password");
@@ -90,83 +95,109 @@ public class WalletActivity extends AppCompatActivity {
         builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                TextInputEditText password = dialogView.findViewById(R.id.wallet_tiet_password);
-                TextInputEditText money = dialogView.findViewById(R.id.wallet_tiet_add_money);
+                TextInputEditText password = dialogView.findViewById(R.id.dialog_wallet_tiet_password);
+                TextInputEditText money = dialogView.findViewById(R.id.dialog_wallet_tiet_add_money);
 
-                if (b) {
-                    money.setVisibility(View.GONE);
-                    if (type.equals("customer")) {
-                        if (password.getText().toString().equals(customerFinal.getPassword())) {
-                            balance.setVisibility(View.VISIBLE);
-                            wallet.setVisibility(View.VISIBLE);
-                            balance.setText(customerFinal.getWallet() + "");
-                            //show balance
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
+                if (type.equals("customer")) {
+                    if (money.getText().toString().length() == 0) {
+                        money.setError("enter amount");
+                    } else if (password.getText().toString().equals(customerFinal.getPassword())) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        customerFinal.setWallet(customerFinal.getWallet() + Long.valueOf(money.getText().toString()));
+                        firebaseFirestore.collection("customer").document(customerFinal.getId())
+                                .update("wallet", customerFinal.getWallet())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        sessionManager.saveCustomer(customerFinal);
+                                        Toast.makeText(getApplicationContext(), "Wallet Updated", Toast.LENGTH_LONG).show();
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d("error at walletcustomer", e.toString());
+                                        progressBar.setVisibility(View.GONE);
 
-                        }
+                                    }
+                                });
                     } else {
-                        if (password.getText().toString().equals(labourerFinal.getPassword())) {
-                            balance.setVisibility(View.VISIBLE);
-                            wallet.setVisibility(View.VISIBLE);
-                            balance.setText(customerFinal.getWallet() + "");
-                            //show balance
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
-
-                        }
+                        Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    if (type.equals("customer")) {
-                        if (money.getText().toString().length() == 0) {
-                            money.setError("enter amount");
-                        }
-                        else if (password.getText().toString().equals(customerFinal.getPassword())) {
-
-                            customerFinal.setWallet(customerFinal.getWallet()+Long.valueOf(money.getText().toString()));
-                            firebaseFirestore.collection("customer").document(customerFinal.getId())
-                                    .update("wallet",customerFinal.getWallet())
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            sessionManager.saveCustomer(customerFinal);
-                                            Toast.makeText(getApplicationContext(),"Wallet Updated",Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.d("error at walletcustomer",e.toString());
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
-                        }
+                    if (password.getText().toString().equals(labourerFinal.getPassword())) {
+                        progressBar.setVisibility(View.INVISIBLE);
+                        labourerFinal.setWallet(labourerFinal.getWallet() + Long.valueOf(money.getText().toString()));
+                        firebaseFirestore.collection("labourer").document(labourerFinal.getId())
+                                .update("wallet", labourerFinal.getWallet())
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        sessionManager.saveLabourer(labourerFinal);
+                                        Toast.makeText(getApplicationContext(), "Wallet Updated", Toast.LENGTH_LONG).show();
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d("error at walletlabourer", e.toString());
+                                        progressBar.setVisibility(View.GONE);
+                                    }
+                                });
                     } else {
-                        if (password.getText().toString().equals(labourerFinal.getPassword())) {
-                            labourerFinal.setWallet(labourerFinal.getWallet()+Long.valueOf(money.getText().toString()));
-                            firebaseFirestore.collection("labourer").document(labourerFinal.getId())
-                                    .update("wallet",labourerFinal.getWallet())
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            sessionManager.saveLabourer(labourerFinal);
-                                            Toast.makeText(getApplicationContext(),"Wallet Updated",Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.d("error at walletlabourer",e.toString());
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
 
-                        }
                     }
                 }
 
+
+                dialog.cancel();
+            }
+
+        });
+
+        builder.setView(dialogView);
+        builder.show();
+    }
+
+    public void alertCheckBalance(View v) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = LayoutInflater.from(v.getContext());
+        final View dialogView = inflater.inflate(R.layout.dialog_confirm_password, null);
+        builder.setView(dialogView);
+
+        builder.setTitle("Confirm Password");
+
+        builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                TextInputEditText password = dialogView.findViewById(R.id.wallet_tiet_password);
+
+                if (type.equals("customer")) {
+                    if (password.getText().toString().equals(customerFinal.getPassword())) {
+                        balance.setVisibility(View.VISIBLE);
+                        wallet.setVisibility(View.VISIBLE);
+                        balance.setText(customerFinal.getWallet() + "");
+                        //show balance
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
+
+                    }
+                } else {
+                    if (password.getText().toString().equals(labourerFinal.getPassword())) {
+                        balance.setVisibility(View.VISIBLE);
+                        wallet.setVisibility(View.VISIBLE);
+                        balance.setText(customerFinal.getWallet() + "");
+                        //show balance
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();
+
+                    }
+                }
                 dialog.cancel();
             }
 

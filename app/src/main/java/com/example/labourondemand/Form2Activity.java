@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -71,7 +72,7 @@ public class Form2Activity extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView navigationView;
     private ServicesFinal servicesFinal;
-    private EditText description, addressLine1, addressLine2, landmark, city, title, numberOfLabourers, dateTime;
+    private TextInputEditText description, addressLine1, addressLine2, landmark, city, title, numberOfLabourers, dateTime,amount;
     private Button submitButton;
     private ViewPager viewPager;
     private Uri filePath;
@@ -85,7 +86,6 @@ public class Form2Activity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private Slide slide;
     private Bitmap compressedImageFile;
-    private EditText amount;
     private Button submit;
     private String TAG = FormActivity.class.getName();
     private String st = "";

@@ -39,6 +39,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:text="Title"
+                android:textStyle="bold"
+                android:textSize="@dimen/text_size_normal"
                 app:layout_constraintStart_toEndOf="@+id/customer_jobs_toolbox"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -93,15 +95,15 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@color/orange"
-                android:text="Job Done"
+                android:text="Complete Job"
                 android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
-    </android.support.v7.widget.CardView>
 
+    </android.support.v7.widget.CardView>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="0dp"
@@ -110,6 +112,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/customer_jobs_fragment_cv">
+
+        <TextView
+            android:visibility="invisible"
+            android:id="@+id/jobs_tv_empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="No Services Applied"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <android.support.v7.widget.RecyclerView
@@ -159,10 +176,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
     </android.support.constraint.ConstraintLayout>
-
-
-
 
 </android.support.constraint.ConstraintLayout>
