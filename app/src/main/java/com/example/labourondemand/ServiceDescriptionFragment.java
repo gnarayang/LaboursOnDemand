@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.StringTokenizer;
+
 import static com.example.labourondemand.R.drawable.ic_plumber_tools;
 
 
@@ -82,7 +84,72 @@ public class ServiceDescriptionFragment extends Fragment {
         skill.setText(services.getSkill().toString());
         description.setText(services.getDescription().toString());
         tags.setText(services.getTitle());
-        startTime.setText(services.getStartTime());
+        StringTokenizer tokenizer = new StringTokenizer(services.getStartTime(), "/");
+        String stTime = "", stDate = "";
+
+        String year = "", month = "", day = "";
+
+        if(tokenizer.hasMoreTokens())
+            year = tokenizer.nextToken();
+        if(tokenizer.hasMoreTokens())
+            month = tokenizer.nextToken();
+        if(tokenizer.hasMoreTokens())
+            day = tokenizer.nextToken();
+
+        stDate += (day + " ");
+
+        switch(month) {
+            case "1":
+                stDate += "Jan";
+                break;
+            case "2":
+                stDate += "Feb";
+                break;
+            case "3":
+                stDate += "Mar";
+                break;
+            case "4":
+                stDate += "Apr";
+                break;
+            case "5":
+                stDate += "May";
+                break;
+            case "6":
+                stDate += "June";
+                break;
+            case "7":
+                stDate += "July";
+                break;
+            case "8":
+                stDate += "Aug";
+                break;
+            case "9":
+                stDate += "Sep";
+                break;
+            case "10":
+                stDate += "Oct";
+                break;
+            case "11":
+                stDate += "Nov";
+                break;
+            case "12":
+                stDate += "Dec";
+                break;
+            default:
+                stDate += "Inv";
+        }
+
+        stDate += (" " + year);
+
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken() + ":");
+        if(tokenizer.hasMoreTokens())
+            stTime += (tokenizer.nextToken());
+
+
+
+        startTime.setText(stDate + "  " + stTime);
+
         if(services.getSkill().equals("Carpenter")) {
             skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_carpenter_tools_colour);
         }
