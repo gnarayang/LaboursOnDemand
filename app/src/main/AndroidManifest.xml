@@ -8,6 +8,9 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.gps"/>
+
     <uses-permission android:name="your.package.name.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -71,12 +74,20 @@
         <activity
             android:name=".WalletActivity"/>
 
-        <activity android:name=".LabourerJobsActivity" />
-        <activity android:name=".LabourerHistoryActivity" />
+        <activity android:name=".LabourerJobsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".LabourerHistoryActivity"
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".LabourerHomeActivity"
+            android:screenOrientation="portrait"
+
             android:label="Home"/>
         <activity android:name=".CustomerHistoryActivity" />
-        <activity android:name=".CustomerJobsActivity" />
+        <activity android:name=".CustomerJobsActivity"
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".GeoFireActivity" />
         <activity
             android:name=".CustomerHomeActivity"

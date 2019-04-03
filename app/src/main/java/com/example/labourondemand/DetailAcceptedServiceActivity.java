@@ -105,8 +105,9 @@ public class DetailAcceptedServiceActivity extends AppCompatActivity
         serviceDescriptionFragment.setArguments(bundle);
 
         viewPagerAdapter.addFragment(serviceDescriptionFragment,"Description");
-        viewPagerAdapter.addFragment(serviceAddressFragment,"Location");
         viewPagerAdapter.addFragment(serviceAmountFragment,"Amount");
+        viewPagerAdapter.addFragment(serviceAddressFragment,"Location");
+
 
         viewPagerData.setAdapter(viewPagerAdapter);
         //viewPagerData.setOffscreenPageLimit(3);

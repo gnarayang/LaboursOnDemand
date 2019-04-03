@@ -136,9 +136,9 @@ public class LabourerMainActivity extends AppCompatActivity implements Navigatio
                 });
     }
 
-    private void fetchServices(ArrayList<String> laborservices) {
+    private void fetchServices(ArrayList<String> labourServices) {
 
-        if(laborservices != null && laborservices.size()>0) {
+        if(labourServices != null && labourServices.size()>0) {
             visibleText.setVisibility(View.GONE);
             firebaseFirestore.collection("services").get()
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -147,8 +147,8 @@ public class LabourerMainActivity extends AppCompatActivity implements Navigatio
                             for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                                 ServicesFinal services;
                                 Log.d("tag", labourer.getSkill() + "!" + documentSnapshot.get("skill") + "!" + documentSnapshot.getData().toString());
-                                for (int i = 0; i < laborservices.size(); i++) {
-                                    if (documentSnapshot.getId().equals(laborservices.get(i))) {
+                                for (int i = 0; i < labourServices.size(); i++) {
+                                    if (documentSnapshot.getId().equals(labourServices.get(i))) {
                                         services = documentSnapshot.toObject(ServicesFinal.class);
                                         services.setServiceId(documentSnapshot.getId());
 

@@ -79,8 +79,8 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void alertUpdateBalance(View v) {
-        balance.setVisibility(View.VISIBLE);
-        wallet.setVisibility(View.VISIBLE);
+        balance.setVisibility(View.INVISIBLE);
+        wallet.setVisibility(View.INVISIBLE);
         AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
 
 // ...Irrelevant code for customizing the buttons and title
@@ -191,7 +191,7 @@ public class WalletActivity extends AppCompatActivity {
                     if (password.getText().toString().equals(labourerFinal.getPassword())) {
                         balance.setVisibility(View.VISIBLE);
                         wallet.setVisibility(View.VISIBLE);
-                        balance.setText(customerFinal.getWallet() + "");
+                        balance.setText(labourerFinal.getWallet() + "");
                         //show balance
                     } else {
                         Toast.makeText(getApplicationContext(), "Wrong Password", Toast.LENGTH_LONG).show();

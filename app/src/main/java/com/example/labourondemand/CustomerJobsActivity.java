@@ -62,6 +62,8 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         navigation = findViewById(R.id.bottom_nav_view);
         noResponse = findViewById(R.id.jobs_tv_empty_text);
 
+        customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
+
         sessionManager = new SessionManager(getApplicationContext());
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -79,7 +81,6 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(2).setChecked(true);
 
-        customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
         Log.d("customer Jobs", customer.toString() + "!");
 
         viewPager = findViewById(R.id.customer_jobs_vp);
@@ -87,8 +88,8 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         viewPager.setAdapter(viewPagerAdapter);
         incomingServices = customer.getIncomingServices();
 
-        if(incomingServices == null)
-        {
+        /*if(incomingServices == null)
+        {*/
             customer.setIncomingServices(new ArrayList<>());
             incomingServices = customer.getIncomingServices();
 
@@ -100,8 +101,12 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                             if(queryDocumentSnapshots.size()==0)
                             {
+                                Log.d("jobs==0",incomingServices.size()+"!");
+
                                 noResponse.setVisibility(View.VISIBLE);
                             }else{
+                                Log.d("jobs",incomingServices.size()+"!");
+
                                 noResponse.setVisibility(View.INVISIBLE);
                             }
                             for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
@@ -117,7 +122,7 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                                 customerJobsFragment.setArguments(bundle);
                                 viewPagerAdapter.addFragment(customerJobsFragment, "Job");
                                 viewPagerAdapter.notifyDataSetChanged();
-                                customer.getIncomingServices().add(servicesFinal);
+                                //customer.getIncomingServices().add(servicesFinal);
                             }
                             sessionManager.saveCustomer(customer);
                         }
@@ -130,11 +135,13 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                     });
 
 
-        }else{
+        /*}else{
             if(incomingServices.size()!=0)
             {
+                Log.d("jobs",incomingServices.size()+"!");
                 noResponse.setVisibility(View.GONE);
             }else{
+                Log.d("jobs====0",incomingServices.size()+"!");
                 noResponse.setVisibility(View.VISIBLE);
             }
             for (int i = 0; i < incomingServices.size(); i++) {
@@ -146,7 +153,7 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                 viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
                 viewPagerAdapter.notifyDataSetChanged();
             }
-        }
+        }*/
 
     }
 

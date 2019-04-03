@@ -85,7 +85,7 @@
                     android:layout_marginStart="@dimen/margin_larger"
                     android:drawableLeft="@drawable/ic_location"
                     android:drawablePadding="@dimen/padding_small"
-                    android:text="3.5 km"
+                    android:text="Not Available"
                     android:textColor="@color/colorPrimary"
                     android:textSize="@dimen/text_size_normal" />
 

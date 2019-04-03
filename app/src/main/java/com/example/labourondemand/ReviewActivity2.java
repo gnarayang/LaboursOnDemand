@@ -301,14 +301,39 @@ public class ReviewActivity2 extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
 
-                                        progressBar.setVisibility(View.GONE);
-                                        customerFinal.setNotReviewedService(null);
-                                        sessionManager.saveCustomer(customerFinal);
-                                        Log.d("success review","yes");
-                                        Intent intent = new Intent(ReviewActivity2.this,CustomerHomeActivity.class);
-                                        intent.putExtra("customer",customerFinal);
-                                        startActivity(intent);
-                                        finish();
+                                        for (LabourerFinal labourerFinal : servicesFinal.getSelectedLabourers()) {
+                                            if(labourerFinal.getAverageRating() == null)
+                                            {
+                                                labourerFinal.setAverageRating(0.0);
+                                            }
+                                            labourerFinal.setAverageRating((labourerFinal.getAverageRating()+ratingFloat)/2.0);
+                                            firebaseFirestore.collection("labourer").document(labourerFinal.getId())
+                                                    .update("averageRating",labourerFinal.getAverageRating())
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            if(servicesFinal.getSelectedLabourers().indexOf(labourerFinal)==(servicesFinal.getSelectedLabourers().size()-1))
+                                                            {
+                                                                progressBar.setVisibility(View.GONE);
+                                                                customerFinal.setNotReviewedService(null);
+                                                                sessionManager.saveCustomer(customerFinal);
+                                                                Log.d("success review","yes");
+                                                                Intent intent = new Intent(ReviewActivity2.this,CustomerHomeActivity.class);
+                                                                intent.putExtra("customer",customerFinal);
+                                                                startActivity(intent);
+                                                                finish();
+                                                            }
+
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.d("failure252",e.toString());
+                                                        }
+                                                    });
+                                        }
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -316,7 +341,6 @@ public class ReviewActivity2 extends AppCompatActivity {
                                     public void onFailure(@NonNull Exception e) {
                                         progressBar.setVisibility(View.GONE);
                                         Log.d("failure2",e.toString());
-
 
                                     }
                                 });

@@ -79,6 +79,13 @@ public class WorkDetailsFragment extends Fragment {
         ratingBar = view.findViewById(R.id.work_rb);
 
         skill.setText(labourer.getSkill().toString());
+        if(labourer.getAverageRating() != null)
+        {
+            //ratingBar.setRating(labourer.getAverageRating());
+        }else
+        {
+            ratingBar.setRating(0.0f);
+        }
 
 
         //ratingBar.setRating(Float.parseFloat(String.valueOf(labourer.getAverageRating())));

@@ -55,6 +55,7 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
 
     private TextView nameHeader;
     private ImageView photoHeader;
+    private SessionManager sessionManager;
 
 
     @SuppressLint("ResourceType")
@@ -64,6 +65,8 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         setContentView(R.layout.activity_labourer_history);
 
         labourer = (LabourerFinal) getIntent().getExtras().getSerializable("labourer");
+
+        sessionManager = new SessionManager(getApplicationContext());
 
         toolbar = findViewById(R.id.labourer_history_tb);
         drawerLayout = findViewById(R.id.labourer_history_dl);
@@ -187,21 +190,21 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
             intent.putExtra("labourer",labourer);
-            intent.putExtra("type","customer");
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
         }  else if (id == R.id.nav_wallet) {
             Intent intent = new Intent(this, WalletActivity.class);
-            Log.d("cbuidbcidbysi",labourer.toString());
+            Log.d("wallet",labourer.toString());
             intent.putExtra("labourer",labourer);
-            intent.putExtra("type","customer");
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
             firebaseAuth.signOut();
-            //session.logoutUser();
+            sessionManager.logoutUser();
             Intent intent = new Intent(LabourerHistoryActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();

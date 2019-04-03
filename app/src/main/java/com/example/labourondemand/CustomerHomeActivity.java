@@ -757,7 +757,6 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
     protected void onRestart() {
         super.onRestart();
         Log.d("customerHome","onres");
-        //navigationView = findViewById(R.id.customer_jobs_nv);
         navigationView.getMenu().getItem(0).setChecked(true);
     }
 }
