@@ -85,9 +85,11 @@
 
             android:label="Home"/>
         <activity android:name=".CustomerHistoryActivity" />
+
         <activity android:name=".CustomerJobsActivity"
             android:screenOrientation="portrait"
             />
+
         <activity android:name=".GeoFireActivity" />
         <activity
             android:name=".CustomerHomeActivity"

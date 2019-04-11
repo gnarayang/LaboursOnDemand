@@ -47,8 +47,14 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
     private SessionManager sessionManager;
     private TextView noResponse;
 
+
     private TextView nameHeader;
     private ImageView photoHeader;
+
+    private ImageView noJobImage;
+    private TextView noJobtv;
+
+
 
     @SuppressLint("ResourceType")
     @Override
@@ -60,9 +66,14 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         drawerLayout = findViewById(R.id.customer_jobs_dl);
         navigationView = findViewById(R.id.customer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
+
         noResponse = findViewById(R.id.jobs_tv_empty_text);
 
         customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
+
+        noJobImage = findViewById(R.id.customer_jobs_iv_no_job);
+        noJobtv = findViewById(R.id.customer_jobs_tv_no_job);
+
 
         sessionManager = new SessionManager(getApplicationContext());
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -133,6 +144,16 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                             Log.d("Customer jobs",e.toString());
                         }
                     });
+        }
+
+        if(currentServices.size() == 0) {
+            noJobImage.setVisibility(View.VISIBLE);
+            noJobtv.setVisibility(View.VISIBLE);
+        }
+        else {
+            noJobImage.setVisibility(View.GONE);
+            noJobtv.setVisibility(View.GONE);
+        }
 
 
         /*}else{
@@ -154,6 +175,7 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                 viewPagerAdapter.notifyDataSetChanged();
             }
         }*/
+
 
     }
 

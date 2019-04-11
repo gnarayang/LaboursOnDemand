@@ -114,6 +114,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
         super.onSaveInstanceState(outState);
     }
 
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -183,6 +184,7 @@ public class CustomerHomeActivity extends AppCompatActivity implements OnMapRead
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapView = mapFragment.getView();
 
+        toolbar = findViewById(R.id.customer_home_tb);
         toolbar = findViewById(R.id.customer_home_tb);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);

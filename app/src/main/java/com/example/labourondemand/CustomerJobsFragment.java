@@ -13,10 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +30,6 @@ import com.google.firebase.firestore.GeoPoint;
 
 import org.imperiumlabs.geofirestore.GeoFirestore;
 
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
@@ -105,6 +100,8 @@ public class CustomerJobsFragment extends Fragment {
     private ImageView skillPic;
     private Button done, sortPrice, sortRating;
     private TextView jobTitle, jobDescription, startTime, startDate;
+    private ImageView noLabourerImage;
+    private TextView noLabourertv;
     private SessionManager sessionManager;
     private TextView noResponse;
 
@@ -205,6 +202,10 @@ public class CustomerJobsFragment extends Fragment {
             default:
                 stDate += "Inv";
         }
+
+
+        stDate += (" " + year);
+
 
         stDate += (" " + year);
 
@@ -351,6 +352,12 @@ public class CustomerJobsFragment extends Fragment {
             }
         });
 
+
+        //for no labourer response
+        noLabourerImage = view.findViewById(R.id.customer_jobs_iv_no_job);
+        noLabourertv = view.findViewById(R.id.customer_jobs_tv_no_job);
+
+
         firebaseFirestore.collection("services").document(currentService.getServiceId())
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
@@ -373,7 +380,15 @@ public class CustomerJobsFragment extends Fragment {
                             customerJobsAdapter.setService(updatedService);
 
                             if (updatedService.getLabourerResponses() != null) {
+
                                 noResponse.setVisibility(View.GONE);
+
+
+                                //bad labourer image
+                                noLabourerImage.setVisibility(View.GONE);
+                                noLabourertv.setVisibility(View.GONE);
+
+
                                 for (String s : updatedService.getLabourerResponses().keySet()) {
 
                                     firebaseFirestore.collection("labourer").document(s)
@@ -434,6 +449,8 @@ public class CustomerJobsFragment extends Fragment {
                                 customerJobsAdapter.addLabourer(labourersToBeAdded.get(i));
                             }*/
                         } else {
+                            noLabourerImage.setVisibility(View.VISIBLE);
+                            noLabourertv.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Current data: null");
                         }
 
