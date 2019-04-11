@@ -115,7 +115,7 @@ public class ServiceAmountFragment extends Fragment {
 
 
         // Dummy comment
-      //  customerAmount.setText(String.valueOf(services.getCustomerAmount()));
+        customerAmount.setText(String.valueOf(services.getCustomerAmount()));
 
 
         submit.setOnClickListener(new View.OnClickListener() {
