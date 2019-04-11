@@ -17,6 +17,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,6 +53,10 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
     private static final String TAG = "LabourerHistoryActivity";
     private LabourerHistoryAdapter labourerHistoryAdapter;
 
+    private TextView nameHeader;
+    private ImageView photoHeader;
+    private SessionManager sessionManager;
+
 
     @SuppressLint("ResourceType")
     @Override
@@ -58,6 +65,8 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         setContentView(R.layout.activity_labourer_history);
 
         labourer = (LabourerFinal) getIntent().getExtras().getSerializable("labourer");
+
+        sessionManager = new SessionManager(getApplicationContext());
 
         toolbar = findViewById(R.id.labourer_history_tb);
         drawerLayout = findViewById(R.id.labourer_history_dl);
@@ -72,7 +81,12 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(1);
+        navigationView.getMenu().getItem(1).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(labourer.getName());
+        Glide.with(getApplicationContext()).load(labourer.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(0).setChecked(true);
@@ -176,21 +190,21 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
             intent.putExtra("labourer",labourer);
-            intent.putExtra("type","customer");
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
         }  else if (id == R.id.nav_wallet) {
             Intent intent = new Intent(this, WalletActivity.class);
-            Log.d("cbuidbcidbysi",labourer.toString());
+            Log.d("wallet",labourer.toString());
             intent.putExtra("labourer",labourer);
-            intent.putExtra("type","customer");
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
             firebaseAuth.signOut();
-            //session.logoutUser();
+            sessionManager.logoutUser();
             Intent intent = new Intent(LabourerHistoryActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
@@ -220,5 +234,14 @@ public class LabourerHistoryActivity extends AppCompatActivity implements Naviga
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressLint("ResourceType")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("customerHistory","onres");
+        //navigationView = findViewById(R.id.customer_jobs_nv);
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 }

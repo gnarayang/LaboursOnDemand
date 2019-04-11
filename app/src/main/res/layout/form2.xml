@@ -1,14 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--<android.support.v4.widget.DrawerLayout
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/form_dl"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="end">-->
-
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -130,33 +122,35 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/activity_form2_til_title"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:hint="Title"
-                android:textColorHint="@color/colorPrimary">
+                android:layout_margin="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dialog_wallet_til_add_money">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_form2_et_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/colorPrimary"
-                    android:ems="20" />
+                    android:hint="Title"
+                    android:ems="20"/>
+
             </android.support.design.widget.TextInputLayout>
+
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/activity_form2_til_description"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:hint="Description"
-                android:textColorHint="@color/colorPrimary">
+                android:layout_margin="8dp"
 
-                <EditText
+                android:hint="Description">
+
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_form2_et_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -166,15 +160,13 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/activity_form2_til_num"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:hint="Number of Labourers"
-                android:textColorHint="@color/colorPrimary">
+                android:layout_margin="8dp"
+                android:hint="Number of Labourers">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_form2_et_num"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -185,15 +177,13 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/activity_form2_til_time"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:hint="Time"
-                android:textColorHint="@color/colorPrimary">
+                android:layout_margin="8dp"
+                android:hint="Time">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_form2_et_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -206,15 +196,13 @@
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/activity_form2_til_amount"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:hint="Amount"
-                android:textColorHint="@color/colorPrimary">
+                android:layout_margin="8dp"
+                android:hint="Amount">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/activity_form2_et_amount"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,13 +215,13 @@
                 android:id="@+id/activity_form2_btn_submit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:layout_margin="16dp"
                 android:background="@color/orange"
                 android:onClick="save_description"
                 android:layout_marginBottom="8dp"
                 android:text="submit"
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
 

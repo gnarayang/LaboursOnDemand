@@ -276,7 +276,7 @@ public class ProfileActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
                         if (isEditable) {
-                            selectSkill(v);
+                            //selectSkill(v);
                         }
                     }
                 });
@@ -433,7 +433,7 @@ public class ProfileActivity extends AppCompatActivity
         String userId = new String();
 
         if (type.equals("labourer")) {
-            userMap.put("skill", skill.getText().toString());
+            // userMap.put("skill", skill.getText().toString());
             if(uri != null){
                 userMap.put("image",uri.toString());
                 labourer.setImage(uri.toString());

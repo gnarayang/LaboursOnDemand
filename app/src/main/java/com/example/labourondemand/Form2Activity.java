@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
@@ -72,7 +73,7 @@ public class Form2Activity extends AppCompatActivity {
     private Toolbar toolbar;
     private NavigationView navigationView;
     private ServicesFinal servicesFinal;
-    private EditText description, addressLine1, addressLine2, landmark, city, title, numberOfLabourers, dateTime;
+    private TextInputEditText description, addressLine1, addressLine2, landmark, city, title, numberOfLabourers, dateTime,amount;
     private Button submitButton;
     private ViewPager viewPager;
     private Uri filePath;
@@ -86,7 +87,6 @@ public class Form2Activity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private Slide slide;
     private Bitmap compressedImageFile;
-    private EditText amount;
     private Button submit;
     private String TAG = FormActivity.class.getName();
     private String st = "";
@@ -136,6 +136,7 @@ public class Form2Activity extends AppCompatActivity {
         dateTime = findViewById(R.id.activity_form2_et_time);
         tabsImages = findViewById(R.id.form2_tl_images);
         tabsImages.setupWithViewPager(viewPager,true);
+        progressBar = findViewById(R.id.form2_pb);
 
         servicesFinal.setSkill(getIntent().getExtras().getString("skill"));
 
@@ -285,7 +286,7 @@ public class Form2Activity extends AppCompatActivity {
                 dateTime.setError("Please enter time before submitting");
             }
         } else {
-
+            progressBar.setVisibility(View.VISIBLE);
             servicesFinal.setCustomerUID(firebaseAuth.getUid());
             servicesFinal.setDescription(problem_description);
             servicesFinal.setNumOfLabourers(Long.valueOf(number_string));
@@ -320,7 +321,9 @@ public class Form2Activity extends AppCompatActivity {
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 
 
-                        st = st+year+"/"+ (monthOfYear + 1) +"/"+dayOfMonth;
+                        st = st+year+"/"+(monthOfYear+1)+"/"+dayOfMonth;
+
+
 
                         TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
                                 new TimePickerDialog.OnTimeSetListener() {
@@ -453,9 +456,9 @@ public class Form2Activity extends AppCompatActivity {
                                                                                                 String title = "A job is available";
                                                                                                 String body = "Job: "+servicesFinal.getTitle();
                                                                                                 Call<ResponseBody> call = api.sendNotification(token,title,body);
-                                                                                                if(i == queryDocumentSnapshots.size()){
+                                                                                                /*if(i == queryDocumentSnapshots.size()){
                                                                                                     onBackPressed();
-                                                                                                }
+                                                                                                }*/
                                                                                                 call.enqueue(new Callback<ResponseBody>() {
                                                                                                     @Override
                                                                                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -523,6 +526,7 @@ public class Form2Activity extends AppCompatActivity {
                                                                                             Log.d(TAG,"Could not get toke!");
                                                                                         }
                                                                                     });
+                                                                            progressBar.setVisibility(View.GONE);
                                                                             onBackPressed();
 
                                                                         }
@@ -530,6 +534,8 @@ public class Form2Activity extends AppCompatActivity {
                                                                     .addOnFailureListener(new OnFailureListener() {
                                                                         @Override
                                                                         public void onFailure(@NonNull Exception e) {
+                                                                            progressBar.setVisibility(View.GONE);
+                                                                            Log.d("failure 12522", e.toString());
 
                                                                         }
                                                                     });
@@ -539,6 +545,8 @@ public class Form2Activity extends AppCompatActivity {
                                                     .addOnFailureListener(new OnFailureListener() {
                                                         @Override
                                                         public void onFailure(@NonNull Exception e) {
+                                                            progressBar.setVisibility(View.GONE);
+                                                            Log.d("failure 122", e.toString());
 
                                                         }
                                                     });
@@ -603,6 +611,7 @@ public class Form2Activity extends AppCompatActivity {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Log.d("failure 2", e.toString());
+                                        progressBar.setVisibility(View.GONE);
 
                                         Toast.makeText(Form2Activity.this, "(IMAGE Error uri) : " + e.toString(), Toast.LENGTH_LONG).show();
                                     }
@@ -621,9 +630,17 @@ public class Form2Activity extends AppCompatActivity {
             }
 
         } else {
+            Toast.makeText(getApplicationContext(),"Select atleast image",Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
             map.put("images", new ArrayList<String>());
         }
 
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("onDestroy","Form2");
     }
 }

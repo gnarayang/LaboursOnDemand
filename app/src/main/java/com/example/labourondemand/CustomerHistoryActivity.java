@@ -77,7 +77,7 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(1);
+        navigationView.getMenu().getItem(1).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(0).setChecked(true);
@@ -250,6 +250,15 @@ public class CustomerHistoryActivity extends AppCompatActivity implements Naviga
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressLint("ResourceType")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("customerHistory","onres");
+        //navigationView = findViewById(R.id.customer_jobs_nv);
+        navigationView.getMenu().getItem(1).setChecked(true);
     }
 }
 

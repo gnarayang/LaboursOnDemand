@@ -8,6 +8,9 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.gps"/>
+
     <uses-permission android:name="your.package.name.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,6 +28,8 @@
         android:theme="@style/AppTheme.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".ThankYouActivity"></activity>
+
+        <service android:enabled="true" android:name=".MyLocationService"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -42,6 +47,8 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
+
+
         <!--
  <service
             android:name=".notifications.MyService"
@@ -65,22 +72,24 @@
             android:name=".Form2Activity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".WalletActivity"
-            android:screenOrientation="portrait" />
-        <!--
-<activity
-            android:name=".Dummy"
-            android:label="@string/title_activity_dummy"
-            android:theme="@style/AppTheme.NoActionBar.NoActionBar"></activity>
-        -->
-        <activity android:name=".LabourerJobsActivity" />
-        <activity android:name=".LabourerHistoryActivity" />
+            android:name=".WalletActivity"/>
+
+        <activity android:name=".LabourerJobsActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".LabourerHistoryActivity"
+            android:screenOrientation="portrait"
+            />
         <activity android:name=".LabourerHomeActivity"
+            android:screenOrientation="portrait"
+
             android:label="Home"/>
         <activity android:name=".CustomerHistoryActivity" />
-        <activity android:name=".CustomerJobsActivity" >
-            android:label="Jobs"
-        </activity>
+
+        <activity android:name=".CustomerJobsActivity"
+            android:screenOrientation="portrait"
+            />
+
         <activity android:name=".GeoFireActivity" />
         <activity
             android:name=".CustomerHomeActivity"

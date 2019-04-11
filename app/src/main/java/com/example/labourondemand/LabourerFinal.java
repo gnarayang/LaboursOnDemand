@@ -7,6 +7,7 @@ import java.util.Comparator;
 
 public class LabourerFinal extends User implements Serializable {
 
+    private Long price;
     private Services currentService;
     private Double averageRating;
     private boolean isBusy;
@@ -27,6 +28,15 @@ public class LabourerFinal extends User implements Serializable {
         this.incomingServices = incomingServices;
         this.historyServices = historyServices;
     }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
 
     public LabourerFinal(String id, String name, String image, String dob, String city, String state, String addressLine1,
                          String addressLine2, String addressLine3, Long phone, Long wallet, ArrayList<String> services, String email, String password) {

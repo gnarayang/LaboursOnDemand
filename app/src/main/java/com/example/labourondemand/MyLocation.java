@@ -1,5 +1,3 @@
-/*package com.example.labourondemand;
-/*
 package com.example.labourondemand;
 
 import android.app.Service;
@@ -42,4 +40,3 @@ public class MyLocation extends BroadcastReceiver {
         }
     }
 }
-*/

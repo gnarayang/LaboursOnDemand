@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,11 +43,17 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
     private CustomerFinal customer;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
-    private ArrayList<ServicesFinal> currentServices;
+    private ArrayList<ServicesFinal> incomingServices;
     private SessionManager sessionManager;
+    private TextView noResponse;
+
+
+    private TextView nameHeader;
+    private ImageView photoHeader;
 
     private ImageView noJobImage;
     private TextView noJobtv;
+
 
 
     @SuppressLint("ResourceType")
@@ -59,8 +66,14 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         drawerLayout = findViewById(R.id.customer_jobs_dl);
         navigationView = findViewById(R.id.customer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
+
+        noResponse = findViewById(R.id.jobs_tv_empty_text);
+
+        customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
+
         noJobImage = findViewById(R.id.customer_jobs_iv_no_job);
         noJobtv = findViewById(R.id.customer_jobs_tv_no_job);
+
 
         sessionManager = new SessionManager(getApplicationContext());
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -69,23 +82,27 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.getMenu().getItem(2).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(customer.getName());
+        Glide.with(getApplicationContext()).load(customer.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().getItem(2).setChecked(true);
 
-        customer = (CustomerFinal) getIntent().getSerializableExtra("customer");
         Log.d("customer Jobs", customer.toString() + "!");
 
         viewPager = findViewById(R.id.customer_jobs_vp);
         viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapter);
-        currentServices = customer.getIncomingServices();
+        incomingServices = customer.getIncomingServices();
 
-        if(currentServices == null)
-        {
+        /*if(incomingServices == null)
+        {*/
             customer.setIncomingServices(new ArrayList<>());
-            currentServices = customer.getIncomingServices();
+            incomingServices = customer.getIncomingServices();
 
             firebaseFirestore.collection("services").whereEqualTo("customerUID",customer.getId())
                     .whereEqualTo("status","incoming")
@@ -93,7 +110,18 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            if(queryDocumentSnapshots.size()==0)
+                            {
+                                Log.d("jobs==0",incomingServices.size()+"!");
+
+                                noResponse.setVisibility(View.VISIBLE);
+                            }else{
+                                Log.d("jobs",incomingServices.size()+"!");
+
+                                noResponse.setVisibility(View.INVISIBLE);
+                            }
                             for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                Log.d("customerJobs",documentSnapshot.getData().toString());
                                 ServicesFinal servicesFinal = documentSnapshot.toObject(ServicesFinal.class);
                                 servicesFinal.setServiceId(documentSnapshot.getId());
                                 servicesFinal.setApplyable(documentSnapshot.getBoolean("isApplyable"));
@@ -105,14 +133,15 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
                                 customerJobsFragment.setArguments(bundle);
                                 viewPagerAdapter.addFragment(customerJobsFragment, "Job");
                                 viewPagerAdapter.notifyDataSetChanged();
-
+                                //customer.getIncomingServices().add(servicesFinal);
                             }
+                            sessionManager.saveCustomer(customer);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-
+                            Log.d("Customer jobs",e.toString());
                         }
                     });
         }
@@ -126,19 +155,27 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
             noJobtv.setVisibility(View.GONE);
         }
 
-        for (int i = 0; i < currentServices.size(); i++) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("customer", customer);
-            bundle.putSerializable("service", currentServices.get(i));
-            CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
-            customerJobsFragment.setArguments(bundle);
-            viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
-            viewPagerAdapter.notifyDataSetChanged();
-        }
 
-        //should be inside a for loop through all fragments
+        /*}else{
+            if(incomingServices.size()!=0)
+            {
+                Log.d("jobs",incomingServices.size()+"!");
+                noResponse.setVisibility(View.GONE);
+            }else{
+                Log.d("jobs====0",incomingServices.size()+"!");
+                noResponse.setVisibility(View.VISIBLE);
+            }
+            for (int i = 0; i < incomingServices.size(); i++) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("customer", customer);
+                bundle.putSerializable("service", incomingServices.get(i));
+                CustomerJobsFragment customerJobsFragment = new CustomerJobsFragment();
+                customerJobsFragment.setArguments(bundle);
+                viewPagerAdapter.addFragment(customerJobsFragment, "Job" + i);
+                viewPagerAdapter.notifyDataSetChanged();
+            }
+        }*/
 
-        //viewPager.setAdapter(viewPagerAdapter);
 
     }
 
@@ -245,5 +282,14 @@ public class CustomerJobsActivity extends AppCompatActivity implements Navigatio
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @SuppressLint("ResourceType")
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("customerJobs","onres");
+        navigationView = findViewById(R.id.customer_jobs_nv);
+        navigationView.getMenu().getItem(2).setChecked(true);
     }
 }

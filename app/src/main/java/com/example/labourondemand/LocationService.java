@@ -6,6 +6,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -14,6 +16,9 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.util.List;
+import java.util.Locale;
 
 public class LocationService extends Service {
     public static final String BROADCAST_ACTION = "Hello World";
@@ -30,7 +35,6 @@ public class LocationService extends Service {
         super.onCreate();
         intent = new Intent(BROADCAST_ACTION);
     }
-
 
 
     @Override
@@ -98,8 +102,6 @@ public class LocationService extends Service {
         return false;
     }
 
-    */
-/** Checks whether two providers are the same *//*
 
     private boolean isSameProvider(String provider1, String provider2) {
         if (provider1 == null) {
@@ -132,32 +134,29 @@ public class LocationService extends Service {
     }
 
 
-    public class MyLocationListener implements LocationListener
-    {
+    public class MyLocationListener implements LocationListener {
 
-        public void onLocationChanged(final Location loc)
-        {
+        public void onLocationChanged(final Location loc) {
             Log.i("iki", "Location changed");
-            if(isBetterLocation(loc, previousBestLocation)) {
+            if (isBetterLocation(loc, previousBestLocation)) {
                 loc.getLatitude();
                 loc.getLongitude();
                 intent.putExtra("Latitude", loc.getLatitude());
                 intent.putExtra("Longitude", loc.getLongitude());
                 intent.putExtra("Provider", loc.getProvider());
                 sendBroadcast(intent);
-            */
-/*final Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-            String Text = "";
-            try {
-                List<Address> addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                Text = "My current location is: "+addresses.get(0).getAddressLine(0);
+                final Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                String Text = "";
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                    Text = "My current location is: " + addresses.get(0).getAddressLine(0);
 
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                Text = "My current location is: " +"Latitude = " + loc.getLatitude() + ", Longitude = " + loc.getLongitude();
-            }
-            *//*
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    Text = "My current location is: " + "Latitude = " + loc.getLatitude() + ", Longitude = " + loc.getLongitude();
+                }
+
 
                 //Toast.makeText( getApplicationContext(), "Location polled to server", Toast.LENGTH_SHORT).show();
             }
@@ -168,16 +167,16 @@ public class LocationService extends Service {
 
         }
 
-        public void onProviderDisabled(String provider)
-        {
-            Toast.makeText( getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT ).show();
+        public void onProviderDisabled(String provider) {
+            Toast.makeText(getApplicationContext(), "Gps Disabled", Toast.LENGTH_SHORT).show();
         }
 
 
-        public void onProviderEnabled(String provider)
-        {
-            Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
+        public void onProviderEnabled(String provider) {
+            Toast.makeText(getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
         }
 
+    }
+}
 
-    }*/
+*/

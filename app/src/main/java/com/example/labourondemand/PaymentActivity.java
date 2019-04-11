@@ -52,7 +52,7 @@ public class PaymentActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private TextView amount, title, endTime, numOfLabourers;
     private ImageView skill;
-
+    private TextView updateBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,7 @@ public class PaymentActivity extends AppCompatActivity {
         endTime = findViewById(R.id.payment_end_time);
         numOfLabourers = findViewById(R.id.payment_numOfLabourers);
         skill = findViewById(R.id.payment_iv);
+        updateBalance = findViewById(R.id.payment_update_tv);
 
         toolbar = findViewById(R.id.payment_tb);
         toolbar.setTitle("Make Payment");
@@ -205,6 +206,21 @@ public class PaymentActivity extends AppCompatActivity {
             }
         });
 
+        updateBalance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(),WalletActivity.class);
+                intent.putExtra("customer",customerFinal);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("onRestart","fsd");
     }
 
     public void check(View v) {
@@ -223,8 +239,8 @@ public class PaymentActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 TextInputEditText password = dialogView.findViewById(R.id.wallet_tiet_password);
-                TextInputEditText amount = dialogView.findViewById(R.id.wallet_tiet_add_money);
-                amount.setVisibility(View.GONE);
+                //TextInputEditText amount = dialogView.findViewById(R.id.wallet_tiet_add_money);
+                //amount.setVisibility(View.GONE);
 
                 if (password.getText().toString().equals(customerFinal.getPassword())) {
                     // do payent

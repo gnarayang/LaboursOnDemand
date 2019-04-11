@@ -21,10 +21,14 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.GeoPoint;
+
+import org.imperiumlabs.geofirestore.GeoFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -93,13 +97,16 @@ public class CustomerJobsFragment extends Fragment {
     private CustomerJobsAdapter customerJobsAdapter;
     private FirebaseFirestore firebaseFirestore;
     private FirebaseAuth firebaseAuth;
-    private TextView noResponse;
     private ImageView skillPic;
     private Button done, sortPrice, sortRating;
     private TextView jobTitle, jobDescription, startTime, startDate;
     private ImageView noLabourerImage;
     private TextView noLabourertv;
     private SessionManager sessionManager;
+    private TextView noResponse;
+
+    private CollectionReference geoFirestoreRefCarpenter;
+    private GeoFirestore geoFirestore;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,7 +114,8 @@ public class CustomerJobsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_customer_jobs, container, false);
 
-        noResponse = view.findViewById(R.id.customer_dashboard2_tv_no_response);
+        geoFirestoreRefCarpenter = FirebaseFirestore.getInstance().collection(currentService.getSkill() + "Location");
+        geoFirestore = new GeoFirestore(geoFirestoreRefCarpenter);
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -123,7 +131,7 @@ public class CustomerJobsFragment extends Fragment {
 
         /*Spinner spin = (Spinner) view.findViewById(R.id.spinner);
         spin.setOnItemSelectedListener();*/
-
+        noResponse = view.findViewById(R.id.jobs_tv_empty_text);
         jobTitle = view.findViewById(R.id.customer_jobs_title);
         jobDescription = view.findViewById(R.id.customer_jobs_jobDescription);
         startTime = view.findViewById(R.id.customer_jobs_start_time_tv);
@@ -131,6 +139,13 @@ public class CustomerJobsFragment extends Fragment {
 
         jobTitle.setText(currentService.getTitle());
         jobDescription.setText(currentService.getDescription());
+
+        if(customer.getIncomingServices().indexOf(currentService)>=0)
+        {
+          Log.d("incom",currentService.toString()+"!");
+        } else{
+            Log.d("incom -1",currentService.toString()+"!");
+        }
 
         //show correct date and time
         StringTokenizer tokenizer = new StringTokenizer(currentService.getStartTime(), "/");
@@ -188,17 +203,11 @@ public class CustomerJobsFragment extends Fragment {
                 stDate += "Inv";
         }
 
+
         stDate += (" " + year);
 
-        //format to indian form date
-//        String pattern = "dd/MM/yyyy";
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-//
-//        try {
-//            stDate = new SimpleDateFormat("dd/MM/yyyy").format(simpleDateFormat.parse(stDate));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
+
+        stDate += (" " + year);
 
         if(tokenizer.hasMoreTokens())
             stTime += (tokenizer.nextToken() + ":");
@@ -294,6 +303,16 @@ public class CustomerJobsFragment extends Fragment {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
+                                    customer = sessionManager.getCustomer(customer.getId());
+
+                                    if(customer.getIncomingServices().indexOf(currentService)>=0)
+                                    {
+                                        customer.getIncomingServices().remove(currentService);
+                                        Log.d("incomDONE",currentService.toString()+"!");
+                                    } else{
+                                        Log.d("incomDONE -1",currentService.toString()+"!");
+                                    }
+
                                     firebaseFirestore.collection("customer").document(customer.getId())
                                             .update("notPaidService",currentService.getServiceId(),
                                                     "notReviewedService",currentService.getServiceId())
@@ -362,9 +381,13 @@ public class CustomerJobsFragment extends Fragment {
 
                             if (updatedService.getLabourerResponses() != null) {
 
+                                noResponse.setVisibility(View.GONE);
+
+
                                 //bad labourer image
                                 noLabourerImage.setVisibility(View.GONE);
                                 noLabourertv.setVisibility(View.GONE);
+
 
                                 for (String s : updatedService.getLabourerResponses().keySet()) {
 
@@ -373,18 +396,52 @@ public class CustomerJobsFragment extends Fragment {
                                             .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                                 @Override
                                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
+
                                                     LabourerFinal labourerFinal = documentSnapshot.toObject(LabourerFinal.class);
                                                     labourerFinal.setId(documentSnapshot.getId());
-                                                    customerJobsAdapter.addLabourer(labourerFinal);
+                                                    labourerFinal.setPrice(updatedService.getLabourerResponses().get(labourerFinal.getId()));
+
+                                                    if(labourerFinal.getAverageRating() == null)
+                                                    {
+                                                        labourerFinal.setAverageRating(0.0);
+                                                    }
+
+                                                    Log.d("labourer",labourerFinal.getAverageRating()+"1");
+                                                    String skill = currentService.getSkill()+"Location";
+                                                    geoFirestoreRefCarpenter.document(labourerFinal.getId())
+                                                            .get()
+                                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                                @Override
+                                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                                                    ArrayList<Double> g = (ArrayList<Double>) documentSnapshot.get("l");
+                                                                    Log.d("geo",g+"!");
+                                                                    GeoPoint geoPoint = new GeoPoint(g.get(0),g.get(1));
+                                                                    labourerFinal.setCurrentLocation(geoPoint);
+                                                                    customerJobsAdapter.addLabourer(labourerFinal);
+                                                                }
+                                                            })
+                                                            .addOnFailureListener(new OnFailureListener() {
+                                                                @Override
+                                                                public void onFailure(@NonNull Exception e) {
+                                                                    Log.d(TAG, "failure11111"+e.toString());
+
+                                                                }
+                                                            });
+
                                                 }
                                             })
                                             .addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "failure"+e.toString());
 
                                                 }
                                             });
                                 }
+                            }
+                            else{
+                                noResponse.setVisibility(View.VISIBLE);
                             }
                             /*ArrayList<LabourerFinal> labourersToBeAdded = updatedService.getLabourers();
                             labourersToBeAdded.removeAll(currentService.getLabourers());
@@ -405,17 +462,36 @@ public class CustomerJobsFragment extends Fragment {
 
     void sortLabourerBasedOnPrice() {
         ArrayList<LabourerFinal> labourers = customerJobsAdapter.getLabourers();
+        currentService = customerJobsAdapter.getService();
+
+        for(LabourerFinal labourer : labourers)
+        {
+            Log.d("lab before price sort",labourer.getPrice()+"!");
+        }
 
         for(int i = 0; i < labourers.size(); i++) {
-            int min = 0;
+            int min = i;
             for(int j = i+1; j < labourers.size(); j++) {
-                if(currentService.getLabourerResponses().get(labourers.get(i).getId()) < currentService.getLabourerResponses().get(labourers.get(i).getId())) {
+                /*if(currentService.getLabourerResponses().get(labourers.get(i).getId()) < currentService.getLabourerResponses().get(labourers.get(i).getId())) {
                     min = i;
+                }*/
+                if(labourers.get(j).getPrice() < labourers.get(min).getPrice()) {
+                    min = j;
                 }
             }
-            LabourerFinal tempLabourer = labourers.get(min);
-            labourers.set(min, labourers.get(i));
-            labourers.set(i, tempLabourer);
+            if(i != min) {
+                Log.d("not equal",min+"###"+i);
+                LabourerFinal tempLabourer = labourers.get(min);
+                labourers.set(min, labourers.get(i));
+                labourers.set(i, tempLabourer);
+            }
+
+            //Long temp = currentService.getLabourerResponses().
+        }
+
+        for(LabourerFinal labourer : labourers)
+        {
+            Log.d("labouer a price sort",labourer.getPrice()+"!");
         }
 
         customerJobsAdapter.setLabourers(labourers);
@@ -423,19 +499,31 @@ public class CustomerJobsFragment extends Fragment {
 
     void sortLabourerBasedOnRating() {
         ArrayList<LabourerFinal> labourers = customerJobsAdapter.getLabourers();
+        currentService = customerJobsAdapter.getService();
 
-        for(int i = 0; i < labourers.size(); i++) {
-            int max = 0;
-            for(int j = i+1; j < labourers.size(); j++) {
-                if(labourers.get(i).getAverageRating() > labourers.get(max).getAverageRating()) {
-                    max = i;
-                }
-            }
-            LabourerFinal tempLabourer = labourers.get(max);
-            labourers.set(max, labourers.get(i));
-            labourers.set(i, tempLabourer);
+        for(LabourerFinal labourer : labourers)
+        {
+            Log.d("labouerbefore sort",labourer.getAverageRating()+"!");
         }
-
+        for(int i = 0; i < labourers.size(); i++) {
+            int max = i;
+            for(int j = i+1; j < labourers.size(); j++) {
+                if(labourers.get(j).getAverageRating() > labourers.get(max).getAverageRating()) {
+                    max = j;
+                }
+                Log.d("max",max+"###");
+            }
+            if(i != max) {
+                Log.d("not equal",max+"###"+i);
+                LabourerFinal tempLabourer = labourers.get(max);
+                labourers.set(max, labourers.get(i));
+                labourers.set(i, tempLabourer);
+            }
+        }
+        for(LabourerFinal labourer : labourers)
+        {
+            Log.d("labouer",labourer.getAverageRating()+"!");
+        }
         customerJobsAdapter.setLabourers(labourers);
     }
 

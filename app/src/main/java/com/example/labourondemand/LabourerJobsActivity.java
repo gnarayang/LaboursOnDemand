@@ -11,11 +11,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class LabourerJobsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -26,7 +37,11 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
     private FirebaseAuth firebaseAuth;
     private String tag = LabourerHomeActivity.class.getName();
     private BottomNavigationView navigation;
+    private TextView nameHeader;
+    private ImageView photoHeader;
+    private LabourerFinal labourer;
 
+    private SessionManager sessionManager;
 
     @SuppressLint("ResourceType")
     @Override
@@ -39,19 +54,111 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
         navigationView = findViewById(R.id.labourer_jobs_nv);
         navigation = findViewById(R.id.bottom_nav_view);
 
+        sessionManager = new SessionManager(getApplicationContext());
+
+        labourer = (LabourerFinal) getIntent().getExtras().get("labourer");
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.getMenu().getItem(2).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(labourer.getName());
+        Glide.with(getApplicationContext()).load(labourer.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(2).setChecked(true);
+
 
 
 
     }
+
+   /* private void fetchFromFirebase() {
+
+        firebaseFirestore.collection("labourer").document(firebaseAuth.getUid()).get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        //labourer = new Labourer();
+                        if (documentSnapshot.getData() != null) {
+                            labourer = documentSnapshot.toObject(LabourerFinal.class);
+                            Log.d(tag, documentSnapshot.getData().toString() + "!");
+
+                            if (labourer.getServices() != null) {
+                                Log.d("tagggg",labourer.getSkill()+"!");
+                                ArrayList<String> s = labourer.getServices();
+                                Log.d("LabourMainActivity",s+"!");
+                                fetchServices(s);
+                            }else{
+
+                            }
+
+                        } else {
+                            Log.d(tag, "null");
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+    }
+
+    private void fetchServices(ArrayList<String> labourServices) {
+
+        if(labourServices != null && labourServices.size()>0) {
+            visibleText.setVisibility(View.GONE);
+            firebaseFirestore.collection("services").get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                ServicesFinal services;
+                                Log.d("tag", labourer.getSkill() + "!" + documentSnapshot.get("skill") + "!" + documentSnapshot.getData().toString());
+                                for (int i = 0; i < labourServices.size(); i++) {
+                                    if (documentSnapshot.getId().equals(labourServices.get(i))) {
+                                        services = documentSnapshot.toObject(ServicesFinal.class);
+                                        services.setServiceId(documentSnapshot.getId());
+
+                                        final ServicesFinal finalServices = services;
+                                        firebaseFirestore.collection("customer").document(services.getCustomerUID()).get()
+                                                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                                                        finalServices.setCustomer(documentSnapshot.toObject(CustomerFinal.class));
+                                                        dashboardAdapter.added(finalServices);
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.d(tag, "error fetchService2 : " + e.toString());
+                                                    }
+                                                });
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(tag, "error fetchService1 : " + e.toString());
+                        }
+                    });
+        }else{
+            visibleText.setVisibility(View.VISIBLE);
+
+        }
+    }*/
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -60,10 +167,14 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.bottom_navigation_home:
-
+                    Intent intent1 = new Intent(LabourerJobsActivity.this, LabourerHomeActivity.class);
+                    intent1.putExtra("labourer",labourer);
+                    startActivity(intent1);
                     return true;
                 case R.id.bottom_navigation_history:
-
+                    Intent intent = new Intent(LabourerJobsActivity.this, LabourerHistoryActivity.class);
+                    intent.putExtra("labourer",labourer);
+                    startActivity(intent);
                     return true;
                 case R.id.bottom_navigation_jobs:
 
@@ -89,38 +200,38 @@ public class LabourerJobsActivity extends AppCompatActivity implements Navigatio
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
+            Intent intent = new Intent(LabourerJobsActivity.this,LabourerHomeActivity.class);
+            intent.putExtra("labourer",labourer);
+            startActivity(intent);
+            finish();
         } else if (id == R.id.nav_history) {
-            //Toast.makeText(this,"History yet to be Developed",)
-            Intent intent = new Intent(this, PreviousActivity.class);
+            Intent intent = new Intent(LabourerJobsActivity.this,LabourerHistoryActivity.class);
+            intent.putExtra("labourer",labourer);
             startActivity(intent);
-        } else if (id == R.id.nav_jobs) {
+            finish();
+        }else if (id == R.id.nav_jobs) {
 
-        }else if (id == R.id.nav_profile) {
-            Intent intent = new Intent(this, ProfileActivity.class);
-            /*Bundle bundle = new Bundle();
-            bundle.putParcelable("labourer",labourer);*//*
-            intent.putExtra("user", labourer);
+        } else if (id == R.id.nav_profile) {
+            Intent intent = new Intent(LabourerJobsActivity.this, ProfileActivity.class);
+            intent.putExtra("labourer",labourer);
             intent.putExtra("type","labourer");
-            Log.d(tag, "labourer : " + labourer.getAddressLine1());*/
+            Log.d(tag, "labourer : " + labourer.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_manage) {
-            //Intent settings = new Intent(LabourerMainActivity.this,SettingsActivity.class);
-            //startActivity(settings);
-
-        } else if (id == R.id.nav_share) {
-
+        }  else if (id == R.id.nav_wallet) {
+            Intent intent = new Intent(this, WalletActivity.class);
+            Log.d("wallet",labourer.toString());
+            intent.putExtra("labourer",labourer);
+            intent.putExtra("type","labourer");
+            Log.d(tag, "labourer : " + labourer.getAddressLine1());
+            startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
-
             firebaseAuth.signOut();
+            sessionManager.logoutUser();
             Intent intent = new Intent(LabourerJobsActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        } else if (id == R.id.nav_wallet) {
-            /*Intent intent = new Intent(CustomerHistoryActivity.this, NAME.class);
-            startActivity(intent);*/
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);

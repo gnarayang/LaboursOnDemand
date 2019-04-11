@@ -1,6 +1,7 @@
 package com.example.labourondemand;
 
 import android.content.Context;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -63,6 +64,8 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
     public void setService(ServicesFinal service) {
         Log.d("set Service in ada", service.toString());
         this.service = service;
+        this.labourers = new ArrayList<>();
+
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -99,9 +102,23 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
         final LabourerFinal labourer = labourers.get(position);
         Glide.with(context).load(labourer.getImage()).into(holder.photo);
         holder.name.setText(labourer.getName());
-        if(service.getLabourerResponses() != null){
+        if (service.getLabourerResponses() != null) {
             holder.price.setText(String.valueOf(service.getLabourerResponses().get(labourer.getId())));
         }
+
+
+        if (labourer.getCurrentLocation() != null) {
+            Location l1 = new Location("");
+            l1.setLatitude(service.getDestinationLatitude());
+            l1.setLongitude(service.getDestinationLongitude());
+
+            Location l2 = new Location("");
+            l2.setLatitude(labourer.getCurrentLocation().getLatitude());
+            l2.setLongitude(labourer.getCurrentLocation().getLongitude());
+            double d = l1.distanceTo(l2);
+
+        }
+
 
         holder.accept.setText("Accept");
         if (labourer.getAverageRating() == null) {
@@ -110,7 +127,7 @@ public class CustomerJobsAdapter extends RecyclerView.Adapter<CustomerJobsAdapte
             holder.rating.setText(String.valueOf(labourer.getAverageRating()));
         }
 
-        if (service.getSelectedLabourerUID()!= null &&service.getSelectedLabourerUID().contains(labourer.getId())) {
+        if (service.getSelectedLabourerUID() != null && service.getSelectedLabourerUID().contains(labourer.getId())) {
             holder.accept.setText("Accepted");
         } else {
             holder.accept.setText("Accept");

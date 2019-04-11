@@ -150,6 +150,7 @@ public class ServiceDescriptionFragment extends Fragment {
 
         startTime.setText(stDate + "  " + stTime);
 
+
         if(services.getSkill().equals("Carpenter")) {
             skill.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0,R.drawable.ic_carpenter_tools_colour);
         }

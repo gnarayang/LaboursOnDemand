@@ -2,6 +2,7 @@ package com.example.labourondemand;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,19 +29,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.darwindeveloper.horizontalscrollmenulibrary.custom_views.HorizontalScrollMenuView;
 import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,6 +59,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 
@@ -80,15 +93,75 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
     private SupportMapFragment mapFragment;
     private View mapView;
     private static final int PERMISSION_REQUEST_CODE = 200;
+    private SessionManager sessionManager;
 
     private Double max = 0.0;
     private Spinner spinner;
+
+    static LabourerHomeActivity instance;
+    LocationRequest locationRequest;
+    FusedLocationProviderClient fusedLocationProviderClient;
+
+    public static LabourerHomeActivity getInstance() {
+        return instance;
+    }
+    TextView textView;
+
+    private TextView nameHeader;
+    private ImageView photoHeader;
 
     @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_labourer_home);
+
+
+        sessionManager = new SessionManager(getApplicationContext());
+        instance = this;
+        labourerFinal = (LabourerFinal) getIntent().getExtras().get("labourer");
+
+        //textView = findViewById(R.id.labourer_home_no_response_tv);
+
+       /* Dexter.withActivity(this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        Log.d("permission",response.toString());
+                        updateLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        Toast.makeText(LabourerHomeActivity.this, "you nsna", Toast.LENGTH_LONG).show();
+                        Log.d("permissiondenied",response.toString());
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        Log.d("permission ratio",permission.toString());
+                    }
+
+
+                }).check();*/
+
+       if(runtime_permissions(getApplicationContext(),0.0))
+       {
+           Log.d("labour home",true+"!");
+       Intent intent = new Intent(this,MyLocationService.class);
+       intent.putExtra("labourer",labourerFinal);
+        this.startService(intent);
+        }else{
+
+           Log.d("labour home",false+"!");
+           Intent intent = new Intent(this,MyLocationService.class);
+           intent.putExtra("labourer",labourerFinal);
+           this.startService(intent);
+       }
+
+
+//        startService(new Intent(this,MyLocationService .class));
 
         spinner = findViewById(R.id.sp);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -112,9 +185,16 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        navigationView.setCheckedItem(2);
+        navigationView.getMenu().getItem(0).setChecked(true);
+        View header = navigationView.getHeaderView(0);
+        nameHeader = header.findViewById(R.id.nav_header_tv);
+        photoHeader = header.findViewById(R.id.nav_header_iv);
+        nameHeader.setText(labourerFinal.getName());
+        Glide.with(getApplicationContext()).load(labourerFinal.getImage()).into(photoHeader);
         navigationView.setNavigationItemSelectedListener(this);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(1).setChecked(true);
+
         viewPager = findViewById(R.id.labourer_home_vp);
         viewPagerAdapterLabourer = new ViewPagerAdapterLabourer(getSupportFragmentManager());
         viewPager.setAdapter(viewPagerAdapterLabourer);
@@ -124,7 +204,6 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
         //viewPagerAdapterLabourer.addFragment(new CardVIewJobs(),"cdc");
         viewPager.setAdapter(viewPagerAdapterLabourer);
 
-        labourerFinal = (LabourerFinal) getIntent().getExtras().get("labourer");
         Log.d("labourerHome", labourerFinal.toString());
 
        /* slide = new Slide(this, new ArrayList<String>());
@@ -207,6 +286,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
         //viewPager.setAdapter(viewPagerAdapterLabourer);
 
+
+
+
         //Spinner spinner = (Spinner) findViewById(R.id.labourer_home_sp);
         spinner.setOnItemSelectedListener(this);
 
@@ -223,6 +305,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                 mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                 Log.d("Location " + position, sydney.toString());
+
+
+
 //                Location l1 = new Location("");
 //                l1.setLatitude(myLocation.getLatitude());
 //                l1.setLongitude(myLocation.getLongitude());
@@ -244,6 +329,60 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
             }
         });
 
+    }
+
+    private void updateLocation() {
+        buildLocationRequest();
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
+
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d("onrestart","1");
+        super.onRestart();
+        Log.d("onrestart","2");
+        labourerFinal = sessionManager.getLabourer(labourerFinal.getId());
+        navigationView.getMenu().getItem(1).setChecked(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("ondestroy","1");
+        super.onDestroy();
+        Log.d("ondestroy","2");
+    }
+
+    public void update(final String value)
+    {
+
+        LabourerHomeActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("location brodcast ",value+"!");
+                //textView.(value);
+            }
+        });
+    }
+
+    private PendingIntent getPendingIntent() {
+        Intent intent = new Intent(this,MyLocation.class);
+        intent.setAction(MyLocation.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(2000);
+        locationRequest.setFastestInterval(1000);
+        locationRequest.setSmallestDisplacement(10f);
     }
 
     private Boolean runtime_permissions(Context context, Double max) {
@@ -274,7 +413,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
         if (requestCode == 100) {
 
-            Log.d("results", grantResults.toString() + "!");
+            Log.d("results", grantResults + "!");
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("onReqPermissionResult", String.valueOf(requestCode));
 
@@ -372,7 +511,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
         } else if (id == R.id.nav_history) {
 
-            Intent intent = new Intent(LabourerHomeActivity.this, LabourerHomeActivity.class);
+            Intent intent = new Intent(LabourerHomeActivity.this, LabourerHistoryActivity.class);
             intent.putExtra("labourer", labourerFinal);
             startActivity(intent);
             finish();
@@ -384,25 +523,28 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
             finish();
         } else if (id == R.id.nav_profile) {
             Intent intent = new Intent(this, ProfileActivity.class);
-            intent.putExtra("labourer", labourerFinal);
-            intent.putExtra("type", "customer");
+            intent.putExtra("labourer",labourerFinal);
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourerFinal.getAddressLine1());
             startActivity(intent);
-        } else if (id == R.id.nav_wallet) {
+        }  else if (id == R.id.nav_wallet) {
             Intent intent = new Intent(this, WalletActivity.class);
-            Log.d("cbuidbcidbysi", labourerFinal.toString());
-            intent.putExtra("labourer", labourerFinal);
-            intent.putExtra("type", "customer");
+            Log.d("wallet",labourerFinal.toString());
+            intent.putExtra("labourer",labourerFinal);
+            intent.putExtra("type","labourer");
             Log.d(tag, "labourer : " + labourerFinal.getAddressLine1());
             startActivity(intent);
         } else if (id == R.id.nav_send) {
 
         } else if (id == R.id.nav_logout) {
             firebaseAuth.signOut();
-            //session.logoutUser();
+            sessionManager.logoutUser();
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
+        }
+        else{
+            Log.d("labourer home",id+"!");
         }
 
         drawerLayout.closeDrawer(GravityCompat.START);
@@ -489,13 +631,31 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                         CardVIewJobs cv = new CardVIewJobs();
                                         cv.setArguments(bundle);
                                         viewPagerAdapterLabourer.addFragment(cv, "cc");
-                                        viewPagerAdapterLabourer.notifyDataSetChanged();
                                         mMap.clear();
+
+                                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+                                        LatLng latLng = new LatLng(l1.getLatitude(),l1.getLongitude());
+                                        LatLng latLng2 = new LatLng(l2.getLatitude(),l2.getLongitude());
+                                        builder.include(latLng);
+                                        builder.include(latLng2);
+
+                                        LatLngBounds bounds = builder.build();
+                                        int padding = 50; // offset from edges of the map in pixels
+                                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
                                         LatLng sydney = new LatLng(servicesFinalForLocation.get(0).getDestinationLatitude(), servicesFinalForLocation.get(0).getDestinationLongitude());
                                         LatLng myLocationLatLng = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
                                         Log.d("First location", sydney.toString());
-                                        mMap.addMarker(new MarkerOptions().position(sydney).title("Job location"));
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                        mMap.addMarker(new MarkerOptions().position(latLng2).title("Job location"));
+                                        mMap.addMarker(new MarkerOptions().position(latLng).title("My Location"));
+                                        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+                                            @Override
+                                            public void onMapLoaded() {
+                                                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+                                            }
+                                        });
+                                        //mMap.animateCamera(cu);
                                         TextView textView;
                                         textView = (TextView)findViewById(R.id.labourer_home_tv_error);
                                         textView.setVisibility(View.INVISIBLE);
@@ -513,7 +673,7 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                         CardVIewJobs cv = new CardVIewJobs();
                                         cv.setArguments(bundle);
                                         viewPagerAdapterLabourer.addFragment(cv, "cc");
-                                        viewPagerAdapterLabourer.notifyDataSetChanged();
+
 
 
 //                                                        Location l1 = new Location("");
@@ -540,6 +700,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
                                         //finalServices.setCustomer(documentSnapshot.toObject(Customer.class));
                                         //dashboardAdapter.added(finalServices);
                                     }
+                                    viewPagerAdapterLabourer.notifyDataSetChanged();
+
+                                    viewPager.setOffscreenPageLimit(viewPagerAdapterLabourer.getCount());
 
                                 }
 
@@ -558,6 +721,13 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
 
 
     }
+
+    /*mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+        @Override
+        public void onMapLoaded() {
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 30));
+        }
+    });*/
 
     //Later to be deleted
 
@@ -677,8 +847,9 @@ public class LabourerHomeActivity extends AppCompatActivity implements Navigatio
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         Log.d("nothing", "dccv");
-        TextView textView = findViewById(R.id.labourer_home_tv_error);
-        textView.setVisibility(View.VISIBLE);
         //fetchServices(Double.POSITIVE_INFINITY);
     }
+
+
+
 }
